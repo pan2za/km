@@ -86,8 +86,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements IKmDocService {
 
-    @Value("${files.docservice.url.site-ip}")
-    private String docserviceSiteIp;
+    //@Value("${files.docservice.url.site-ip}")
+    //private String docserviceSiteIp;
     @Resource
     private KmDocMapper kmDocMapper;
     @Autowired
@@ -1625,9 +1625,9 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
             response.sendError(HttpStatus.NOT_FOUND.value(),"无效的文档");
             return;
         }
-        log.info("docserviceSiteIp:" + docserviceSiteIp);
+       // log.info("docserviceSiteIp:" + docserviceSiteIp);
         log.info("req.getRemoteAddr():" + req.getRemoteAddr());
-        boolean onlyOfficeDownloadFlag = req.getRemoteAddr().equals(docserviceSiteIp);
+        boolean onlyOfficeDownloadFlag = false; // req.getRemoteAddr().equals(docserviceSiteIp);
         //24小时下载次数限制：via redis，对院内用户不限制
         if(onlyOfficeDownloadFlag ){
             getKmDoc(kmDoc, req,response, "Edit");
