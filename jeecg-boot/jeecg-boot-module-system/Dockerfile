@@ -3,7 +3,7 @@ FROM registry.cn-hangzhou.aliyuncs.com/jeecgdocker/alpine-java:8_server-jre_unli
 ENV container docker
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; \
-yum install libreoffice.x86_64 -y; \
+apk add libreoffice; \
 mkdir /kykms; 
 
 WORKDIR /kykms

@@ -1,17 +1,15 @@
 ##文件上传和转换工具的配置
 base:
-  upload-dir: d:\KM\upload
-  db-backup-dir: c:\KmDocs
-  soffice-path: C:\Program Files\LibreOffice\program\soffice.exe
+  upload-dir: /kykms/kmdocs 
+  db-backup-dir: /kykms/db
+  soffice-path: /usr/bin/soffice
   one-system-url:
 
 ##ElasticSearch服务配置 for highLevelRestClient
 esclient:
-  master-host: xxxxx
+  master-host: kykms-ES 
   master-port: 9200
-  master-auth: true
-  master-user-name: elastic
-  master-user-pwd: xxxxxxx
+  master-auth: false 
 
 spring:
   servlet:
@@ -91,14 +89,14 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://xxxx:3306/km_businesss_dev?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://kykms-mysql:3306/km_businesss_dev?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
-          password: xxxxxxx
+          password: root 
           driver-class-name: com.mysql.cj.jdbc.Driver
   #redis 配置
   redis:
     database: 0
-    host: 127.0.0.1
+    host: kykms-redis 
     lettuce:
       pool:
         max-active: 8   #最大连接数据库连接数,设 -1 为没有限制
