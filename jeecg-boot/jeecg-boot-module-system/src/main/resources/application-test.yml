@@ -16,7 +16,7 @@ spring:
     dynamic:
       datasource:
         master:
-          url: jdbc:mysql://kykms-mysql:3306/km_trial?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://kykms-mysql:3306/km?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
           password: root 
           driver-class-name: com.mysql.cj.jdbc.Driver
