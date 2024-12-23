@@ -1,14 +1,12 @@
 base:
-  upload-dir: d:\KmDocs
-  db-backup-dir: d:\KmDbBackup
-  soffice-path: c:\Program Files\LibreOffice\program\soffice.exe
+  upload-dir: /kykms/kmdocs 
+  db-backup-dir: /kykms/db
+  soffice-path: /usr/bin/soffice 
   one-system-url:
 esclient:
-  master-host: xxxxx
+  master-host: kykms-ES 
   master-port: 9200
-  master-auth: true
-  master-user-name: elastic
-  master-user-pwd: xxxx
+  master-auth: false 
 spring:
   servlet:
     multipart:
@@ -18,13 +16,13 @@ spring:
     dynamic:
       datasource:
         master:
-          url: jdbc:mysql://xxxxxx:3306/km_trial?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://kykms-mysql:3306/km_trial?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
-          password: xxxxxx
+          password: root 
           driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     database: 9
-    host: localhost
+    host: kykms-redis 
     lettuce:
       pool:
         max-active: 8
