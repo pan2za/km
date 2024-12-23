@@ -1,0 +1,11 @@
+1
+must change ant-*/.env.production's API endpoint to http://<public-ip-of-kms>:<public-port>
+so do .env.test
+
+2 after change, the frontend should be repackaged.
+
+docker rm kykms-ui
+docker rmi kykms-ui
+ 
+then run docker-compose again to generate the image and container.
+
