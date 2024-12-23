@@ -57,3 +57,15 @@ services:
     hostname: kykms
     ports:
       - 8080:8080
+
+  kykms-ui:
+    build:
+      context: ../
+      dockerfile: Dockerfile.vue.build
+    restart: on-failure
+    privileged: true
+    container_name: kykms-ui
+    image: kykms-ui
+    hostname: kykms-ui
+    ports:
+      - 30018:80
