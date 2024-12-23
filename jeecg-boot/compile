@@ -1,0 +1,25 @@
+compile the jar in a docker:
+
+1 create a compile env.
+
+./jdk8.docker
+
+2 enter the docker and compile
+
+1a50> 
+
+git clone km_community.git
+
+cd km_community
+
+cd jeecg-boot
+
+change mvn settings ( ref to maven-settings-and-compile)
+
+mvn package
+
+3 copy compiled file to host
+
+docker cp 1a50f4c4b61c:/km_community/jeecg-boot/jeecg-boot-module-system/target/jeecg-boot-module-system-2.4.5.jar jeecg-boot-module-system/target/
+
+
