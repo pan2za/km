@@ -1,0 +1,10 @@
+1 km.sys_user can't find.
+A:
+docker exec -it kykms-mysql bash
+mysql -uroot -p km
+source /docker-entrypoint-initdb.d/km_mysql.sql
+
+2 can't login to the backend.
+A:
+ see oem.
+ you should change the jeecg-backend API address in the vue distribution.

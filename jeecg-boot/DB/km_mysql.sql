@@ -48,7 +48,7 @@ CREATE TABLE `km_doc`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `km_doc_business_type`;
 CREATE TABLE `km_doc_business_type`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `business_type` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
@@ -83,7 +83,7 @@ INSERT INTO `km_doc_favourite` VALUES ('1531984806786387970', 'e9ca23d68d884d4eb
 -- ----------------------------
 DROP TABLE IF EXISTS `km_doc_topic_type`;
 CREATE TABLE `km_doc_topic_type`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `doc_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `topic_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
@@ -109,7 +109,7 @@ CREATE TABLE `km_doc_visit_record`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `km_file`;
 CREATE TABLE `km_file`  (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `sha256` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   `physical_path` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   `url` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
