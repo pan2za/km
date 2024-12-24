@@ -1,4 +1,8 @@
-1
+1 change kykms-ui public/config.js when the kykms backend API URL has changed.
+vi public/config.js
+docker cp public/config.js kykms-ui:/var/www/html/config.js
+
+2 (this method is obsoleted)
 must change ant-*/.env.production's API endpoint to http://<public-ip-of-kms>:<public-port>
 so do .env.test
 
