@@ -1,7 +1,9 @@
 1 km.sys_user can't find.
 A:
+docker cp DB/km_mysql.sql kykms-mysql:/docker-entrypoint-initdb.d/km_mysql.sql
 docker exec -it kykms-mysql bash
 mysql -uroot -p km
+passwd: root
 source /docker-entrypoint-initdb.d/km_mysql.sql
 
 2 can't login to the backend.

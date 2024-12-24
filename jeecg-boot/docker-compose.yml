@@ -27,13 +27,13 @@ services:
     hostname: kykms-redis
     container_name: kykms-redis
 
-  kykms-ES:
+  kykms-es:
     build:
       context: ./ES
-    image: elasticsearch:7.6.1
+    #image: elasticsearch:7.6.1
     restart: always
-    hostname: kykms-ES
-    container_name: kykms-ES
+    hostname: kykms-es
+    container_name: kykms-es
     ports:
       - 9200:9200
       - 9300:9300
@@ -51,7 +51,7 @@ services:
     depends_on:
       - kykms-mysql
       - kykms-redis
-      - kykms-ES
+      - kykms-es
     container_name: kykms
     image: kykms
     hostname: kykms
