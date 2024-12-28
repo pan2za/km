@@ -6,7 +6,10 @@ base:
 esclient:
   master-host: kykms-ES 
   master-port: 9200
-  master-auth: false 
+  master-auth: true
+  master-user-name: admin
+  master-user-pwd: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:secret}
+
 spring:
   servlet:
     multipart:

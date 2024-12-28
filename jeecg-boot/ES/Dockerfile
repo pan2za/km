@@ -1,6 +1,4 @@
-FROM elasticsearch:7.6.1
+FROM docker.1ms.run/opensearchproject/opensearch:latest
 
-MAINTAINER hnliuwx@gmail.com
-
-RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install -b  https://release.infinilabs.com/analysis-ik/stable/elasticsearch-analysis-ik-7.6.1.zip
+RUN /usr/share/opensearch/bin/opensearch-plugin install -b https://release.infinilabs.com/analysis-ik/stable/opensearch-analysis-ik-2.18.0.zip
 

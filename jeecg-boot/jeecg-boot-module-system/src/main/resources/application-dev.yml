@@ -9,7 +9,9 @@ base:
 esclient:
   master-host: kykms-ES 
   master-port: 9200
-  master-auth: false 
+  master-auth: true
+  master-user-name: admin
+  master-user-pwd: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:secret}
 
 spring:
   servlet:
@@ -115,8 +117,9 @@ jeecg :
     upload: /opt/upFiles
     #webapp文件路径
     webapp: /opt/webapp
+  # FIXME: should add more, see ShiroConfig class
   shiro:
-    excludeUrls: /category/**,/sys/category/**,/sys/dictItem/**,/sys/loginThird,/KM/EsMgnt/**,/KM/kmSysConfig/querySiteInfo
+    excludeUrls: /sys/randomImage/**,/sys/login,/KM/kmSysConfig/listAllConfig,/sys/loginAuto,/onlyoffice/**,/category/**,/sys/category/**,/sys/dictItem/**,/sys/loginThird,/KM/EsMgnt/**,/KM/kmSysConfig/querySiteInfo
   #阿里云oss存储和大鱼短信秘钥配置
   oss:
     accessKey: ??
