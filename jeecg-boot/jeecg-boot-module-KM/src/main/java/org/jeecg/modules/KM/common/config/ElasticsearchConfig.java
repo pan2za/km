@@ -6,13 +6,16 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.RestClientBuilder;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.apache.http.HttpHost;
 
 @Configuration
 @ConfigurationProperties(prefix = "esclient")
@@ -67,20 +70,28 @@ public class ElasticsearchConfig {
     public void setMasterUserPwd(String masterUserPwd) {
         this.masterUserPwd = masterUserPwd;
     }
-
-
+    /*
+     * 创建一个仅支持HTTP的OpenSearch客户端。
+     *
+     * @return OpenSearchClient 实例
+     */
     @Bean
-    public RestHighLevelClient restHighLevelClient() {
-
-        HttpHost host=new HttpHost(masterHost, masterPort, HttpHost.DEFAULT_SCHEME_NAME);
-        RestClientBuilder builder=RestClient.builder(host);
-        if(masterAuth) {
-            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(masterUserName, masterUserPwd));
-            builder.setHttpClientConfigCallback(f -> f.setDefaultCredentialsProvider(credentialsProvider));
-        }
-        RestHighLevelClient restClient = new RestHighLevelClient( builder);
-
-        return restClient;
+    public OpenSearchClient openSearchClient() {
+        // 设置主机信息
+        final String hostname = masterHost;
+        final int port = masterPort;
+        final String scheme = HttpHost.DEFAULT_SCHEME_NAME; // 使用HTTP协议
+    
+        // 创建RestClient实例
+        RestClientBuilder builder = RestClient.builder(new HttpHost(hostname, port, scheme));
+    
+        // 创建RestClientTransport实例
+        RestClientTransport transport = new RestClientTransport(builder.build(), new JacksonJsonpMapper());
+    
+        // 创建OpenSearchClient实例
+        OpenSearchClient client = new OpenSearchClient(transport);
+    
+        return client;
     }
+
 }

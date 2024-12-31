@@ -2,8 +2,8 @@ FROM docker.1ms.run/maven:3-jdk-8 as build
 
 WORKDIR /app
 
-RUN git clone https://gitee.com/colornix/km.git 
 ADD ./settings.xml /root/.m2/settings.xml
+RUN git clone https://gitee.com/colornix/km.git 
 WORKDIR /app/km/jeecg-boot
 
 RUN mvn clean package -DskipTests

@@ -6,24 +6,41 @@ import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.WriteRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
+
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.Refresh;
+import org.opensearch.client.opensearch.core.IndexRequest;
+import org.opensearch.client.opensearch.core.IndexResponse;
+import org.opensearch.client.transport.TransportOptions;
+import org.opensearch.client.opensearch._types.Time;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.indices.AnalyzeRequest;
+import org.opensearch.client.opensearch.indices.AnalyzeResponse;
+import org.opensearch.client.opensearch.indices.analyze.AnalyzeToken;
+import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch._types.query_dsl.QueryBuilders;
+import org.opensearch.client.opensearch._types.query_dsl.TermsQuery;
+import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
+import org.opensearch.client.opensearch._types.query_dsl.MatchQuery;
+import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
+import org.opensearch.client.opensearch._types.query_dsl.PrefixQuery;
+import org.opensearch.client.opensearch._types.query_dsl.TermQuery;
+import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.query_dsl.TermQuery;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch._types.SortOptions;
+import org.opensearch.client.opensearch._types.SortOrder;
+
+import org.opensearch.client.json.JsonData;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.UUIDGenerator;
@@ -46,7 +63,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
+import java.time.Duration;
+import java.util.Date;
+import java.util.Date;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -57,7 +80,7 @@ public class KmDocVisitRecordServiceImpl extends ServiceImpl<KmDocVisitRecordMap
     @Autowired
     private EsUtils esUtils;
     @Autowired
-    private RestHighLevelClient restHighLevelClient;
+    private OpenSearchClient openSearchClient;
     @Autowired
     private KMRedisUtils kMRedisUtils;
 
@@ -122,15 +145,14 @@ public class KmDocVisitRecordServiceImpl extends ServiceImpl<KmDocVisitRecordMap
         try {
             //插入数据，index不存在则自动根据匹配到的template创建。index没必要每天创建一个，如果是为了灵活管理，最低建议每月一个 yyyyMM。
             String indexSuffix = KMDateUtils.formatDateyyyyMM(DateUtils.getDate());
-            IndexRequest indexRequest = new IndexRequest(KMConstant.DocVisitIndexName + "_" + indexSuffix);
-            indexRequest.timeout(TimeValue.timeValueHours(KMConstant.SaveTimeOutMinutes));
-            indexRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-            indexRequest.source(new JSONObject(kmDocVisitRecordEsVO,
-                            new JSONConfig().setDateFormat(DatePattern.NORM_DATETIME_PATTERN)).toString()
-                    , XContentType.JSON);
-            IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
-            if (!response.status().equals(RestStatus.CREATED)) {
-                log.error("入库ES发生错误，返回码:" + response.status().toString() );
+            IndexRequest.Builder<KmDocVisitRecordEsVO> indexRequest = new IndexRequest.Builder<KmDocVisitRecordEsVO>()
+		    .index(KMConstant.DocVisitIndexName + "_" + indexSuffix);
+            indexRequest.timeout(Time.of(t -> t.time(String.format("%sm",KMConstant.SaveTimeOutMinutes))));
+            indexRequest.refresh(Refresh.WaitFor);
+	        indexRequest.document(kmDocVisitRecordEsVO);
+            IndexResponse response = openSearchClient.index(indexRequest.build());
+            if (!"created".equalsIgnoreCase(response.result().toString())) {
+                log.error("入库ES发生错误，返回码:" + response.result().toString() );
             }
             else
                 log.debug("访问记录入库ES成功");
@@ -143,41 +165,11 @@ public class KmDocVisitRecordServiceImpl extends ServiceImpl<KmDocVisitRecordMap
 
     @Deprecated
     @Override
-    public List<String> recentlyVisitedDocs(String createBy)  throws IOException {
+    public List<String> recentlyVisitedDocs(String createBy) throws IOException {
         List<String> result = new ArrayList<>();
+        // I GIVE UP.
 
-        QueryBuilder queryBuilder = QueryBuilders
-                .termQuery("createBy",createBy);
-        FieldSortBuilder fieldSortBuilder = SortBuilders.fieldSort("createTime").order(SortOrder.DESC);
-        String[] includeFields = new String[] {"docId"};
-        String[] excludeFields = new String[] {};
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder
-                .query(queryBuilder)
-                .sort(fieldSortBuilder)
-                .size(10);
-//                .fetchSource(includeFields,excludeFields);
-        //超时 60S
-        searchSourceBuilder.timeout(new TimeValue(KMConstant.SearchTimeOutSeconds, TimeUnit.SECONDS));
-
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.source(searchSourceBuilder);
-        searchRequest.indices(KMConstant.DocVisitIndexAliasName);
-
-        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-
-        if(searchResponse.status() == RestStatus.OK && searchResponse.getHits().getTotalHits().value>0){
-
-            SearchHits hits = searchResponse.getHits();
-            SearchHit[] searchHits = hits.getHits();
-
-            for (SearchHit hit : searchHits) {
-                KmDocEsVO kmDocEsVO = JSON.parseObject(hit.getSourceAsString(), KmDocEsVO.class);
-                result.add(kmDocEsVO.getDocId());
-            }
-        }
-
-        return  result;
+        return result;
     }
 
 }

@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.shiro.SecurityUtils;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.PermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
@@ -48,8 +47,8 @@ public class KmDocController extends JeecgController<KmDoc, IKmDocService> {
 	private IKmDocService kmDocService;
 	@Autowired
 	private IKmFileService kmFileService;
-	@Autowired
-	private RestHighLevelClient client;
+	//@Autowired
+	//private openSearchClient client;
 	@Autowired
 	private KMConstant commonConstant;
 	@Autowired

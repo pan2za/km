@@ -22,7 +22,7 @@ services:
       - opensearch-net
 
   kykms-redis:
-    image: redis:5.0
+    image: docker.1ms.run/redis:5.0
     ports:
       - 6379:6379
     restart: always

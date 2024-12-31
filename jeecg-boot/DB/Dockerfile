@@ -1,4 +1,4 @@
-FROM mysql:5.7
+FROM docker.1ms.run/mysql:5.7
 
 MAINTAINER hnliuwx@gmail.com
 

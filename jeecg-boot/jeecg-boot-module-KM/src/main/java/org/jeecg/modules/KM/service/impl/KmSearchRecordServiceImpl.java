@@ -5,22 +5,39 @@ import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.WriteRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.Refresh;
+import org.opensearch.client.opensearch.core.IndexRequest;
+import org.opensearch.client.opensearch.core.IndexResponse;
+import org.opensearch.client.transport.TransportOptions;
+import org.opensearch.client.opensearch._types.Time;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.indices.AnalyzeRequest;
+import org.opensearch.client.opensearch.indices.AnalyzeResponse;
+import org.opensearch.client.opensearch.indices.analyze.AnalyzeToken;
+import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch._types.query_dsl.QueryBuilders;
+import org.opensearch.client.opensearch._types.query_dsl.TermsQuery;
+import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
+import org.opensearch.client.opensearch._types.query_dsl.MatchQuery;
+import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
+import org.opensearch.client.opensearch._types.query_dsl.PrefixQuery;
+import org.opensearch.client.opensearch._types.query_dsl.TermQuery;
+import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.query_dsl.TermQuery;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch._types.SortOptions;
+import org.opensearch.client.opensearch._types.SortOrder;
+
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
+
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.system.vo.SysCategoryModel;
@@ -47,7 +64,7 @@ public class KmSearchRecordServiceImpl extends ServiceImpl<KmSearchRecordMapper,
     @Autowired
     private EsUtils esUtils;
     @Autowired
-    private RestHighLevelClient restHighLevelClient;
+    private OpenSearchClient openSearchClient;
     @Autowired
     private ISysBaseAPI sysBaseAPI;
 
@@ -89,78 +106,78 @@ public class KmSearchRecordServiceImpl extends ServiceImpl<KmSearchRecordMapper,
     @Override
     public List<String> hotKeywordReport() throws IOException {
         List<String> result = new ArrayList<>();
-
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        TermsAggregationBuilder aggregationBuilder =
-                AggregationBuilders
-                        .terms("keyword")
-                        .field("keywordsMax")
-                        .size(10);
-
-        searchSourceBuilder.aggregation(aggregationBuilder);
-//
-        //超时 60S
-        searchSourceBuilder.timeout(new TimeValue(KMConstant.SearchTimeOutSeconds, TimeUnit.SECONDS));
-
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.source(searchSourceBuilder);
-        searchRequest.indices(KMConstant.KMSearchRecordIndexAliasName);
-
-        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        if(searchResponse.status() != RestStatus.OK || searchResponse.getHits().getTotalHits().value<=0){
+    
+        // 构建聚合
+        TermsAggregation aggregation = new TermsAggregation.Builder()
+                .field("keywordsMax")
+                .size(10)
+                .build();
+    
+        // 构建搜索请求
+        SearchRequest searchRequest = new SearchRequest.Builder()
+                .index(KMConstant.KMSearchRecordIndexAliasName)
+                .aggregations("keyword", new Aggregation.Builder().terms(aggregation).build())
+                .timeout(String.format("%ss",KMConstant.SearchTimeOutSeconds))
+                .build();
+    
+        // 执行搜索
+        SearchResponse<Object> searchResponse = openSearchClient.search(searchRequest, Object.class);
+    
+        // 检查搜索结果
+        if (searchResponse.hits().total().value() <= 0) {
             return null;
-        }
-        else {
-            Aggregations responseAggregations = searchResponse.getAggregations();
-            ParsedStringTerms terms = responseAggregations.get("keyword");
-            List<? extends Terms.Bucket> buckets = terms.getBuckets();
-
-            for (Terms.Bucket bucket : buckets) {
-                String term = bucket.getKeyAsString();
-                //Integer docCount = new Long( bucket.getDocCount()).intValue();
+        } else {
+            // 获取聚合结果
+            StringTermsAggregate terms = searchResponse.aggregations().get("keyword").sterms();
+            List<StringTermsBucket> buckets = terms.buckets().array();
+    
+            // 遍历聚合桶
+            for (StringTermsBucket bucket : buckets) {
+                String term = bucket.key();
                 result.add(term);
             }
         }
-
-        return  result;
+        return result;
     }
 
     @Override
-    public List<SysCategoryModel> retriveHotTopic() throws IOException{
+    public List<SysCategoryModel> retriveHotTopic() throws IOException {
         List<SysCategoryModel> result = new ArrayList<>();
-
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        TermsAggregationBuilder aggregationBuilder =
-                AggregationBuilders
-                        .terms("topicCode")
-                        .field("topicCodes")
-                        .size(10);
-
-        searchSourceBuilder.aggregation(aggregationBuilder);
-        //超时 60S
-        searchSourceBuilder.timeout(new TimeValue(KMConstant.SearchTimeOutSeconds, TimeUnit.SECONDS));
-
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.source(searchSourceBuilder);
-        searchRequest.indices(KMConstant.KMSearchRecordIndexAliasName);
-
-        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        if(searchResponse.status() != RestStatus.OK || searchResponse.getHits().getTotalHits().value<=0){
+    
+        // 构建聚合
+        TermsAggregation aggregation = new TermsAggregation.Builder()
+                .field("topicCodes")
+                .size(10)
+                .build();
+    
+        // 构建搜索请求
+        SearchRequest searchRequest = new SearchRequest.Builder()
+                .index(KMConstant.KMSearchRecordIndexAliasName)
+                .aggregations("topicCode", new Aggregation.Builder().terms(aggregation).build())
+                .timeout(String.format("%ss",KMConstant.SearchTimeOutSeconds))
+                .build();
+    
+        // 执行搜索
+        SearchResponse<Object> searchResponse = openSearchClient.search(searchRequest, Object.class);
+    
+        // 检查搜索结果
+        if (searchResponse.hits().total().value() <= 0) {
             return null;
-        }
-        else {
-            Aggregations responseAggregations = searchResponse.getAggregations();
-            ParsedStringTerms terms = responseAggregations.get("topicCode");
-            List<? extends Terms.Bucket> buckets = terms.getBuckets();
-
-            for (Terms.Bucket bucket : buckets) {
-                String term = bucket.getKeyAsString();
+        } else {
+            // 获取聚合结果
+            StringTermsAggregate terms = searchResponse.aggregations().get("topicCode").sterms();
+            List<StringTermsBucket> buckets = terms.buckets().array();
+    
+            // 遍历聚合桶
+            for (StringTermsBucket bucket : buckets) {
+                String term = bucket.key();
                 SysCategoryModel sysCategoryModel = sysBaseAPI.queryCategoryByCode(term);
-                if(sysCategoryModel!=null )
+                if (sysCategoryModel != null) {
                     result.add(sysCategoryModel);
+                }
             }
         }
-        return  result;
+        return result;
     }
 
     @Override
@@ -200,26 +217,26 @@ public class KmSearchRecordServiceImpl extends ServiceImpl<KmSearchRecordMapper,
         return  kmSearchRecordEsVO;
     }
 
-
-    private void saveToEs(KmSearchRecordEsVO kmSearchRecordEsVO) {
+    //heavily copy from visit record
+    private void saveToEs(KmSearchRecordEsVO kmDocRecordEsVO) {
         try {
             //插入数据，index不存在则自动根据匹配到的template创建。index没必要每天创建一个，如果是为了灵活管理，最低建议每月一个 yyyyMM。
             String indexSuffix = KMDateUtils.formatDateyyyyMM(DateUtils.getDate());
-            IndexRequest indexRequest = new IndexRequest(KMConstant.KMSearchRecordIndexName + "_" + indexSuffix);
-            indexRequest.timeout(TimeValue.timeValueHours(KMConstant.SaveTimeOutMinutes));
-            indexRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-            indexRequest.source(new JSONObject(kmSearchRecordEsVO,
-                            new JSONConfig().setDateFormat(DatePattern.NORM_DATETIME_PATTERN)).toString()
-                    , XContentType.JSON);
-            IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
-            if (!response.status().equals(RestStatus.CREATED)) {
-                log.error("入库ES发生错误，返回码:" + response.status().toString() );
+            IndexRequest.Builder<KmSearchRecordEsVO> indexRequest = new IndexRequest.Builder<KmSearchRecordEsVO>()
+		    .index(KMConstant.DocVisitIndexName + "_" + indexSuffix);
+            indexRequest.timeout(Time.of(t -> t.time(String.format("%sm",KMConstant.SaveTimeOutMinutes))));
+            indexRequest.refresh(Refresh.WaitFor);
+	        indexRequest.document(kmDocRecordEsVO);
+            IndexResponse response = openSearchClient.index(indexRequest.build());
+            if (!"created".equalsIgnoreCase(response.result().toString())) {
+                log.error("入库ES发生错误，返回码:" + response.result().toString() );
             }
             else
-                log.debug("搜索记录入库ES成功");
+                log.debug("访问记录入库ES成功");
         }
         catch (Exception e){
             log.error("入库ES发生错误" ,e );
         }
     }
+
 }
