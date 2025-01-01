@@ -76,7 +76,42 @@ public class ElasticsearchConfig {
      * @return OpenSearchClient 实例
      */
     @Bean
-    public OpenSearchClient openSearchClient() {
+public OpenSearchClient openSearchClient() {
+    if(masterAuth){
+	return openSearchClientWithAuth();
+}else{
+	return openSearchClientNoAuth();
+}
+}
+public OpenSearchClient openSearchClientWithAuth() {
+    // 设置主机信息
+    final String hostname = masterHost;
+    final int port = masterPort;
+    final String scheme = HttpHost.DEFAULT_SCHEME_NAME; // 使用HTTP协议
+
+    // 创建CredentialsProvider并设置用户名和密码
+    final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    credentialsProvider.setCredentials(
+        AuthScope.ANY, // 适用于所有主机和端口
+        new UsernamePasswordCredentials(masterUserName, masterUserPwd) // 替换为实际的用户名和密码
+    );
+
+    // 创建RestClientBuilder并配置身份验证
+    RestClientBuilder builder = RestClient.builder(new HttpHost(hostname, port, scheme))
+        .setHttpClientConfigCallback(httpClientBuilder -> {
+            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            return httpClientBuilder;
+        });
+
+    // 创建RestClientTransport实例
+    RestClientTransport transport = new RestClientTransport(builder.build(), new JacksonJsonpMapper());
+
+    // 创建OpenSearchClient实例
+    OpenSearchClient client = new OpenSearchClient(transport);
+
+    return client;
+}
+    public OpenSearchClient openSearchClientNoAuth() {
         // 设置主机信息
         final String hostname = masterHost;
         final int port = masterPort;

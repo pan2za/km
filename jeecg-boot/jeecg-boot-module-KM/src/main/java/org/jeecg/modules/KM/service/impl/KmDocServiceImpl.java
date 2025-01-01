@@ -100,6 +100,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Slf4j
@@ -704,6 +705,11 @@ public class KmDocServiceImpl extends ServiceImpl<KmDocMapper, KmDoc> implements
                     if(containsIgnoreCase){
                         return Result.OK(customId);
                     }else{
+
+ObjectMapper objectMapper = new ObjectMapper();
+String json = objectMapper.writeValueAsString(kmDocEsVO);
+System.out.println("kmDocEsVO: " + json); // 打印 JSON 数据			    
+			e.printStackTrace();
                         return Result.error("ERROR:index to es exception:" + e.getMessage());
                     }
                 }

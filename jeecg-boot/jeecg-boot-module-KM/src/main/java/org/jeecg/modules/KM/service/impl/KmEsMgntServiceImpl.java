@@ -179,7 +179,7 @@ public class KmEsMgntServiceImpl  implements IKmEsMgntService {
         // 构建mappings配置
         Map<String, Property> properties = new HashMap<>();
         Property dateProp = new Property.Builder()
-            .date(new DateProperty.Builder().format("yyyy-MM-dd").build())
+            .date(new DateProperty.Builder().format("yyyy-MM-dd||epoch_millis||strict_date_optional_time").build())
             .build();
 
         Property txtProp = new Property.Builder()
