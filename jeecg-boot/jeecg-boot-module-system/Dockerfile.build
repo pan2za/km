@@ -1,21 +1,27 @@
-FROM docker.1ms.run/maven:3-jdk-11 as build
+FROM docker.1ms.run/maven:3.8.7-openjdk-18-slim as build
 
 WORKDIR /app
 
 ADD ./settings.xml /root/.m2/settings.xml
+
+# 使用清华源替换默认源
+RUN echo \
+    "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free\n" \
+    "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free\n" \
+    "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free\n" \
+    "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free\n" \
+    > /etc/apt/sources.list
+
+# 更新包索引
+RUN apt-get update
+
+RUN apt install -y git
+
 RUN git clone https://gitee.com/colornix/km.git 
+
 WORKDIR /app/km/jeecg-boot
 
 RUN mvn clean package -DskipTests
-
-# 更换为阿里云的国内源
-RUN echo "deb http://mirrors.aliyun.com/debian/ bullseye main contrib non-free" > /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/debian/ bullseye-updates main contrib non-free" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/debian/ bullseye-backports main contrib non-free" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list
-
-RUN apt update
-RUN apt install -y libreoffice
 
 # 将容器保持运行状态的简单命令
 CMD ["sh", "-c", "while true; do sleep 3600; done"]
