@@ -35,6 +35,9 @@ RUN echo \
     "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free\n" \
     > /etc/apt/sources.list
 
+# 更新包索引
+RUN apt-get update
+
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; \
 apt install -y libreoffice; \
 mkdir /kykms; 
