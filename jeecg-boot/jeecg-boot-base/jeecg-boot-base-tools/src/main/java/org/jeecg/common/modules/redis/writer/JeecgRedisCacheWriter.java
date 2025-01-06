@@ -18,6 +18,8 @@ import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.data.redis.cache.CacheStatisticsCollector;
+import org.springframework.data.redis.cache.CacheStatistics;
 
 /**
  * 该类参照 DefaultRedisCacheWriter 重写了 remove 方法实现通配符*删除
@@ -26,17 +28,41 @@ import org.springframework.util.Assert;
 public class JeecgRedisCacheWriter implements RedisCacheWriter {
 
     private final RedisConnectionFactory connectionFactory;
-    private final Duration sleepTime;
+    private final Duration sleepTime ;
+    private final CacheStatisticsCollector statisticsCollector;
 
     public JeecgRedisCacheWriter(RedisConnectionFactory connectionFactory) {
-        this(connectionFactory, Duration.ZERO);
+        this(connectionFactory, CacheStatisticsCollector.create(),Duration.ZERO);
+    }
+    public JeecgRedisCacheWriter(RedisConnectionFactory redisConnectionFactory, CacheStatisticsCollector statisticsCollector, Duration sleepTime) {
+        this.connectionFactory = redisConnectionFactory;
+        this.statisticsCollector = statisticsCollector;
+        this.sleepTime = sleepTime;
     }
 
     public JeecgRedisCacheWriter(RedisConnectionFactory connectionFactory, Duration sleepTime) {
         Assert.notNull(connectionFactory, "ConnectionFactory must not be null!");
         Assert.notNull(sleepTime, "SleepTime must not be null!");
         this.connectionFactory = connectionFactory;
+        this.statisticsCollector = CacheStatisticsCollector.create();
         this.sleepTime = sleepTime;
+    }
+
+    @Override
+    public RedisCacheWriter withStatisticsCollector(CacheStatisticsCollector cacheStatisticsCollector) {
+        // 返回一个新的实例，支持统计收集器
+        return new JeecgRedisCacheWriter(connectionFactory, statisticsCollector, Duration.ZERO);
+    }
+
+   @Override
+    public void clearStatistics(String cacheName) {
+        // 清除指定缓存的统计信息
+        statisticsCollector.reset(cacheName);
+    }
+    @Override
+    public CacheStatistics getCacheStatistics(String cacheName) {
+        // 返回指定缓存的统计信息
+        return statisticsCollector.getCacheStatistics(cacheName);
     }
 
     public void put(String name, byte[] key, byte[] value, @Nullable Duration ttl) {

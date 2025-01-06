@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
@@ -79,7 +80,9 @@ public class RedisUtil {
 			if (key.length == 1) {
 				redisTemplate.delete(key[0]);
 			} else {
-				redisTemplate.delete(CollectionUtils.arrayToList(key));
+				// 将 String[] 转换为 List<String>
+				List<String> keys = Arrays.asList(key);
+				redisTemplate.delete(keys); // 删除多个键
 			}
 		}
 	}
@@ -585,7 +588,12 @@ public class RedisUtil {
 		try {
 			return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
 				Set<String> binaryKeys = new HashSet<>();
-				Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder().match(realKey).count(Integer.MAX_VALUE).build());
+				Cursor<byte[]> cursor = connection.scan(
+					ScanOptions.scanOptions() // 使用工厂方法创建 ScanOptionsBuilder
+						.match(realKey)        // 设置匹配模式
+						.count(Integer.MAX_VALUE) // 设置每次扫描的数量
+						.build()               // 构建 ScanOptions
+				);
 				while (cursor.hasNext()) {
 					binaryKeys.add(new String(cursor.next()));
 				}
