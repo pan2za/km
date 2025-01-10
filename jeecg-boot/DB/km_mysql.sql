@@ -508,7 +508,17 @@ CREATE TABLE `sys_announcement`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `user_ids` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '指定用户',
   `msg_abstract` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '摘要',
-  `dt_task_id` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '钉钉task_id，用于撤回消息'
+  `dt_task_id` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '钉钉task_id，用于撤回消息',
+  `tenant_id` int(10) NULL DEFAULT 0 COMMENT '租户ID',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sanno_endtime`(`end_time`) USING BTREE,
+  INDEX `idx_sanno_start_time`(`start_time`) USING BTREE,
+  INDEX `idx_sanno_msg_type`(`msg_type`) USING BTREE,
+  INDEX `idx_sanno_send_status`(`send_status`) USING BTREE,
+  INDEX `idx_sanno_del_flag`(`del_flag`) USING BTREE,
+  INDEX `idx_sanno_tenant_id`(`tenant_id`) USING BTREE,
+  INDEX `idx_sanno_sender`(`sender`) USING BTREE,
+  INDEX `idx_sanno_create_time`(`create_time`) USING BTREE  
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '系统通告表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -524,7 +534,12 @@ CREATE TABLE `sys_announcement_send`  (
   `create_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
-  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间'
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `star_flag` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '标星状态( 1为标星 空/0没有标星)',
+  INDEX `idx_sacm_annt_id`(`annt_id`) USING BTREE,
+  INDEX `idx_sacm_user_id`(`user_id`) USING BTREE,
+  INDEX `idx_sacm_read_flag`(`read_flag`) USING BTREE,
+  INDEX `idx_sacm_star_flag`(`star_flag`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户通告阅读标记表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -543,34 +558,37 @@ CREATE TABLE `sys_category`  (
   `sys_org_code` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '所属部门',
   `has_child` varchar(3) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '是否有子节点',
   `sort_order` int(0) NULL DEFAULT NULL,
-  `recommend` tinyint(1) NULL DEFAULT NULL
+  `recommend` tinyint(1) NULL DEFAULT NULL,
+  `tenant_id` int(10) NULL DEFAULT 0 COMMENT '租户ID',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `index_scg_code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_category
 -- ----------------------------
-INSERT INTO `sys_category` VALUES ('1450287793728155650', '1415239215563579394', '信息化项目', 'B04A02', 'ceshi', '2021-10-19 10:28:49', 'ceshi', '2021-10-19 10:28:58', 'A01', '1', 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450287947566837762', '1450287793728155650', '前置性审核', 'B04A02A05', 'ceshi', '2021-10-19 10:29:26', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450287992101957633', '1450287793728155650', '验收备案', 'B04A02A06', 'ceshi', '2021-10-19 10:29:37', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450288184205275137', '1450288104739991553', '数据', 'B04A03A02', 'ceshi', '2021-10-19 10:30:22', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450288234289459202', '1450288104739991553', '服务', 'B04A03A04', 'ceshi', '2021-10-19 10:30:34', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450288263007858689', '1450288104739991553', '系统', 'B04A03A05', 'ceshi', '2021-10-19 10:30:41', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450287865912127490', '1450287793728155650', '立项审批', 'B04A02A02', 'ceshi', '2021-10-19 10:29:06', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1415239215563579394', '0', 'Java编程', 'B04', 'admin', '2021-07-14 04:18:18', 'admin', '2022-03-29 15:06:45', 'A01', '1', 1, 1);
-INSERT INTO `sys_category` VALUES ('1450287893921689602', '1450287793728155650', '项目采购', 'B04A02A03', 'ceshi', '2021-10-19 10:29:13', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1448923409156202498', '1448923264612098049', 'SpringCloud', 'B06A04', 'ceshi', '2021-10-15 16:07:15', 'admin', '2022-03-29 15:07:12', 'A01', NULL, 1, 0);
-INSERT INTO `sys_category` VALUES ('1448923583488253953', '0', '数据库设计', 'B07', 'ceshi', '2021-10-15 16:07:56', 'admin', '2022-03-29 15:07:27', 'A01', '0', 4, 0);
-INSERT INTO `sys_category` VALUES ('1448923935583297538', '0', '前端开发', 'B10', 'ceshi', '2021-10-15 16:09:20', 'admin', '2022-03-29 15:07:51', 'A01', '0', 5, 1);
-INSERT INTO `sys_category` VALUES ('1448924056215674881', '0', '学术研讨', 'B12', 'ceshi', '2021-10-15 16:09:49', 'ceshi', '2021-11-23 14:00:56', 'A01', NULL, 9, 0);
-INSERT INTO `sys_category` VALUES ('1448924139699101697', '0', '移动开发', 'B14', 'ceshi', '2021-10-15 16:10:09', 'admin', '2022-03-29 15:08:29', 'A01', NULL, 11, 0);
-INSERT INTO `sys_category` VALUES ('1448924177934376962', '0', '工作总结', 'B15', 'ceshi', '2021-10-15 16:10:18', 'ceshi', '2021-11-23 14:02:09', 'A01', NULL, 12, NULL);
-INSERT INTO `sys_category` VALUES ('1448924439432454145', '0', '其他', 'B22', 'ceshi', '2021-10-15 16:11:20', 'ceshi', '2021-10-21 16:46:11', 'A01', NULL, 19, NULL);
-INSERT INTO `sys_category` VALUES ('1450287922069663745', '1450287793728155650', '云资源管理', 'B04A02A04', 'ceshi', '2021-10-19 10:29:20', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450287830122131457', '1450287793728155650', '预算编制', 'B04A02A01', 'ceshi', '2021-10-19 10:28:58', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450288104739991553', '1415239215563579394', '信息化框架', 'B04A03', 'ceshi', '2021-10-19 10:30:03', 'ceshi', '2021-10-19 10:30:10', 'A01', '1', 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450288134951563265', '1450288104739991553', '软硬件环境', 'B04A03A01', 'ceshi', '2021-10-19 10:30:11', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1450288212390998018', '1450288104739991553', '平台', 'B04A03A03', 'ceshi', '2021-10-19 10:30:29', NULL, NULL, 'A01', NULL, 1, NULL);
-INSERT INTO `sys_category` VALUES ('1448923264612098049', '0', '架构设计', 'B06', 'ceshi', '2021-10-15 16:06:40', 'admin', '2022-03-29 15:07:03', 'A01', '1', 3, NULL);
+INSERT INTO `sys_category` VALUES ('1450287793728155650', '1415239215563579394', '信息化项目', 'B04A02', 'ceshi', '2021-10-19 10:28:49', 'ceshi', '2021-10-19 10:28:58', 'A01', '1', 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450287947566837762', '1450287793728155650', '前置性审核', 'B04A02A05', 'ceshi', '2021-10-19 10:29:26', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450287992101957633', '1450287793728155650', '验收备案', 'B04A02A06', 'ceshi', '2021-10-19 10:29:37', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450288184205275137', '1450288104739991553', '数据', 'B04A03A02', 'ceshi', '2021-10-19 10:30:22', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450288234289459202', '1450288104739991553', '服务', 'B04A03A04', 'ceshi', '2021-10-19 10:30:34', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450288263007858689', '1450288104739991553', '系统', 'B04A03A05', 'ceshi', '2021-10-19 10:30:41', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450287865912127490', '1450287793728155650', '立项审批', 'B04A02A02', 'ceshi', '2021-10-19 10:29:06', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1415239215563579394', '0', 'Java编程', 'B04', 'admin', '2021-07-14 04:18:18', 'admin', '2022-03-29 15:06:45', 'A01', '1', 1, 1,0);
+INSERT INTO `sys_category` VALUES ('1450287893921689602', '1450287793728155650', '项目采购', 'B04A02A03', 'ceshi', '2021-10-19 10:29:13', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1448923409156202498', '1448923264612098049', 'SpringCloud', 'B06A04', 'ceshi', '2021-10-15 16:07:15', 'admin', '2022-03-29 15:07:12', 'A01', NULL, 1, 0,0);
+INSERT INTO `sys_category` VALUES ('1448923583488253953', '0', '数据库设计', 'B07', 'ceshi', '2021-10-15 16:07:56', 'admin', '2022-03-29 15:07:27', 'A01', '0', 4, 0,0);
+INSERT INTO `sys_category` VALUES ('1448923935583297538', '0', '前端开发', 'B10', 'ceshi', '2021-10-15 16:09:20', 'admin', '2022-03-29 15:07:51', 'A01', '0', 5, 1,0);
+INSERT INTO `sys_category` VALUES ('1448924056215674881', '0', '学术研讨', 'B12', 'ceshi', '2021-10-15 16:09:49', 'ceshi', '2021-11-23 14:00:56', 'A01', NULL, 9, 0,0);
+INSERT INTO `sys_category` VALUES ('1448924139699101697', '0', '移动开发', 'B14', 'ceshi', '2021-10-15 16:10:09', 'admin', '2022-03-29 15:08:29', 'A01', NULL, 11, 0,0);
+INSERT INTO `sys_category` VALUES ('1448924177934376962', '0', '工作总结', 'B15', 'ceshi', '2021-10-15 16:10:18', 'ceshi', '2021-11-23 14:02:09', 'A01', NULL, 12, NULL,0);
+INSERT INTO `sys_category` VALUES ('1448924439432454145', '0', '其他', 'B22', 'ceshi', '2021-10-15 16:11:20', 'ceshi', '2021-10-21 16:46:11', 'A01', NULL, 19, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450287922069663745', '1450287793728155650', '云资源管理', 'B04A02A04', 'ceshi', '2021-10-19 10:29:20', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450287830122131457', '1450287793728155650', '预算编制', 'B04A02A01', 'ceshi', '2021-10-19 10:28:58', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450288104739991553', '1415239215563579394', '信息化框架', 'B04A03', 'ceshi', '2021-10-19 10:30:03', 'ceshi', '2021-10-19 10:30:10', 'A01', '1', 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450288134951563265', '1450288104739991553', '软硬件环境', 'B04A03A01', 'ceshi', '2021-10-19 10:30:11', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1450288212390998018', '1450288104739991553', '平台', 'B04A03A03', 'ceshi', '2021-10-19 10:30:29', NULL, NULL, 'A01', NULL, 1, NULL,0);
+INSERT INTO `sys_category` VALUES ('1448923264612098049', '0', '架构设计', 'B06', 'ceshi', '2021-10-15 16:06:40', 'admin', '2022-03-29 15:07:03', 'A01', '1', 3, NULL,0);
 
 -- ----------------------------
 -- Table structure for sys_check_rule
@@ -632,13 +650,15 @@ CREATE TABLE `sys_data_source`  (
   `update_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新日期',
   `sys_org_code` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '所属部门',
+  `tenant_id` int(10) NULL DEFAULT 0 COMMENT '租户ID',
+  PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_sdc_rule_code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_data_source
 -- ----------------------------
-INSERT INTO `sys_data_source` VALUES ('1209779538310004737', 'local_mysql', 'MySQL5.7', '本地数据库MySQL5.7', '1', 'com.mysql.jdbc.Driver', 'jdbc:mysql://127.0.0.1:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false', 'jeecg-boot', 'root', 'f5b6775e8d1749483f2320627de0e706', 'admin', '2019-12-25 18:14:53', 'admin', '2020-07-10 16:54:42', 'A01');
+INSERT INTO `sys_data_source` VALUES ('1209779538310004737', 'local_mysql', 'MySQL5.7', '本地数据库MySQL5.7', '1', 'com.mysql.jdbc.Driver', 'jdbc:mysql://127.0.0.1:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false', 'jeecg-boot', 'root', 'f5b6775e8d1749483f2320627de0e706', 'admin', '2019-12-25 18:14:53', 'admin', '2020-07-10 16:54:42', 'A01', 0);
 
 -- ----------------------------
 -- Table structure for sys_depart
@@ -666,6 +686,8 @@ CREATE TABLE `sys_depart`  (
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
   `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新日期',
+  `tenant_id` int(10) NULL DEFAULT 0 COMMENT '租户ID',
+  `iz_leaf` tinyint(1) NULL DEFAULT 0 COMMENT '是否有叶子节点: 1是0否',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uniq_depart_org_code`(`org_code`) USING BTREE,
   INDEX `idx_sd_depart_order`(`depart_order`) USING BTREE,
@@ -675,20 +697,20 @@ CREATE TABLE `sys_depart`  (
 -- ----------------------------
 -- Records of sys_depart
 -- ----------------------------
-INSERT INTO `sys_depart` VALUES ('f79b7d5a99b1442c876858a6961cb1fb', NULL, '总裁办公室', NULL, NULL, 0, NULL, '1', '1', 'A01', NULL, NULL, NULL, 'root', NULL, '0', NULL, 'ceshi', '2021-10-14 16:41:10', 'admin', '2022-06-01 21:23:52');
-INSERT INTO `sys_depart` VALUES ('10c6c58575c24db297d838ec5c5f813d', NULL, '秘书部', NULL, NULL, 0, NULL, '1', '1', 'A04', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:29:03', 'admin', '2022-06-01 21:22:04');
-INSERT INTO `sys_depart` VALUES ('a06041ec62674810983326ae552ced92', NULL, '研发部', NULL, NULL, 0, NULL, '1', '1', 'A05', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:30:10', 'admin', '2022-06-01 21:22:11');
-INSERT INTO `sys_depart` VALUES ('e615307e7b684f15885ef6da29f6771d', 'a06041ec62674810983326ae552ced92', '开发部门', NULL, NULL, 1, NULL, '2', '2', 'A05A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:55:59', 'admin', '2022-06-01 21:22:24');
-INSERT INTO `sys_depart` VALUES ('e0c42ad532b24b5fb76e44e9ecc03389', 'e615307e7b684f15885ef6da29f6771d', '前端开发', NULL, NULL, 1, NULL, '2', '3', 'A05A01A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:15', 'admin', '2022-06-01 21:23:24');
-INSERT INTO `sys_depart` VALUES ('2d9f7327dc2e4cf2b62d058a2c422534', 'e615307e7b684f15885ef6da29f6771d', '后端开发', NULL, NULL, 2, NULL, '2', '3', 'A05A01A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:28', 'admin', '2022-06-01 21:23:32');
-INSERT INTO `sys_depart` VALUES ('7aeb44fb58da45b484ab63b338acf738', 'e615307e7b684f15885ef6da29f6771d', '测试部门', NULL, NULL, 3, NULL, '2', '3', 'A05A01A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:42', 'admin', '2022-06-01 21:23:42');
-INSERT INTO `sys_depart` VALUES ('5eebbb70b6e24289933613b83c19c92b', 'a06041ec62674810983326ae552ced92', '运维部', NULL, NULL, 2, NULL, '2', '2', 'A05A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:20', 'admin', '2022-06-01 21:22:31');
-INSERT INTO `sys_depart` VALUES ('2b098c54e19943fb8246e1c1162a63a2', '5eebbb70b6e24289933613b83c19c92b', '系统运维', NULL, NULL, 1, NULL, '2', '3', 'A05A02A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:59:21', 'admin', '2022-06-01 21:23:15');
-INSERT INTO `sys_depart` VALUES ('8ef9c3c7e11e4fe0b2d457803b85cd24', 'a06041ec62674810983326ae552ced92', '市场部', NULL, NULL, 3, NULL, '2', '2', 'A05A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:29', 'admin', '2022-06-01 21:22:40');
-INSERT INTO `sys_depart` VALUES ('d28c13eaaa1d4655ac4a1cd248d10158', '8ef9c3c7e11e4fe0b2d457803b85cd24', '商务部', NULL, NULL, 1, NULL, '2', '3', 'A05A03A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:00:47', 'admin', '2022-06-01 21:22:59');
-INSERT INTO `sys_depart` VALUES ('02e9449426374c099d59d31ba9142520', '8ef9c3c7e11e4fe0b2d457803b85cd24', '销售部', NULL, NULL, 2, NULL, '2', '3', 'A05A03A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:11', 'admin', '2022-06-01 21:22:50');
-INSERT INTO `sys_depart` VALUES ('3995768f0b814cb6ba09a12f833c70f5', '8ef9c3c7e11e4fe0b2d457803b85cd24', '预报运维室', NULL, NULL, 3, NULL, '2', '3', 'A05A03A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:29', NULL, NULL);
-INSERT INTO `sys_depart` VALUES ('1fbd9362d9cd4f3b9781794ca1f509b8', '', '财务部', NULL, NULL, 0, NULL, '1', '1', 'A06', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'admin', '2022-01-06 15:00:32', 'admin', '2022-06-01 21:23:59');
+INSERT INTO `sys_depart` VALUES ('f79b7d5a99b1442c876858a6961cb1fb', NULL, '总裁办公室', NULL, NULL, 0, NULL, '1', '1', 'A01', NULL, NULL, NULL, 'root', NULL, '0', NULL, 'ceshi', '2021-10-14 16:41:10', 'admin', '2022-06-01 21:23:52',0,1);
+INSERT INTO `sys_depart` VALUES ('10c6c58575c24db297d838ec5c5f813d', NULL, '秘书部', NULL, NULL, 0, NULL, '1', '1', 'A04', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:29:03', 'admin', '2022-06-01 21:22:04',0,1);
+INSERT INTO `sys_depart` VALUES ('a06041ec62674810983326ae552ced92', NULL, '研发部', NULL, NULL, 0, NULL, '1', '1', 'A05', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:30:10', 'admin', '2022-06-01 21:22:11',0,1);
+INSERT INTO `sys_depart` VALUES ('e615307e7b684f15885ef6da29f6771d', 'a06041ec62674810983326ae552ced92', '开发部门', NULL, NULL, 1, NULL, '2', '2', 'A05A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:55:59', 'admin', '2022-06-01 21:22:24',0,1);
+INSERT INTO `sys_depart` VALUES ('e0c42ad532b24b5fb76e44e9ecc03389', 'e615307e7b684f15885ef6da29f6771d', '前端开发', NULL, NULL, 1, NULL, '2', '3', 'A05A01A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:15', 'admin', '2022-06-01 21:23:24',0,1);
+INSERT INTO `sys_depart` VALUES ('2d9f7327dc2e4cf2b62d058a2c422534', 'e615307e7b684f15885ef6da29f6771d', '后端开发', NULL, NULL, 2, NULL, '2', '3', 'A05A01A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:28', 'admin', '2022-06-01 21:23:32',0,1);
+INSERT INTO `sys_depart` VALUES ('7aeb44fb58da45b484ab63b338acf738', 'e615307e7b684f15885ef6da29f6771d', '测试部门', NULL, NULL, 3, NULL, '2', '3', 'A05A01A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:42', 'admin', '2022-06-01 21:23:42',0,1);
+INSERT INTO `sys_depart` VALUES ('5eebbb70b6e24289933613b83c19c92b', 'a06041ec62674810983326ae552ced92', '运维部', NULL, NULL, 2, NULL, '2', '2', 'A05A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:20', 'admin', '2022-06-01 21:22:31',0,1);
+INSERT INTO `sys_depart` VALUES ('2b098c54e19943fb8246e1c1162a63a2', '5eebbb70b6e24289933613b83c19c92b', '系统运维', NULL, NULL, 1, NULL, '2', '3', 'A05A02A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:59:21', 'admin', '2022-06-01 21:23:15',0,1);
+INSERT INTO `sys_depart` VALUES ('8ef9c3c7e11e4fe0b2d457803b85cd24', 'a06041ec62674810983326ae552ced92', '市场部', NULL, NULL, 3, NULL, '2', '2', 'A05A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:29', 'admin', '2022-06-01 21:22:40',0,1);
+INSERT INTO `sys_depart` VALUES ('d28c13eaaa1d4655ac4a1cd248d10158', '8ef9c3c7e11e4fe0b2d457803b85cd24', '商务部', NULL, NULL, 1, NULL, '2', '3', 'A05A03A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:00:47', 'admin', '2022-06-01 21:22:59',0,1);
+INSERT INTO `sys_depart` VALUES ('02e9449426374c099d59d31ba9142520', '8ef9c3c7e11e4fe0b2d457803b85cd24', '销售部', NULL, NULL, 2, NULL, '2', '3', 'A05A03A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:11', 'admin', '2022-06-01 21:22:50',0,1);
+INSERT INTO `sys_depart` VALUES ('3995768f0b814cb6ba09a12f833c70f5', '8ef9c3c7e11e4fe0b2d457803b85cd24', '预报运维室', NULL, NULL, 3, NULL, '2', '3', 'A05A03A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:29', NULL, NULL,0,1);
+INSERT INTO `sys_depart` VALUES ('1fbd9362d9cd4f3b9781794ca1f509b8', '', '财务部', NULL, NULL, 0, NULL, '1', '1', 'A06', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'admin', '2022-01-06 15:00:32', 'admin', '2022-06-01 21:23:59',0,1);
 
 -- ----------------------------
 -- Table structure for sys_depart_permission
@@ -759,61 +781,65 @@ CREATE TABLE `sys_dict`  (
   `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `type` decimal(11, 0) NULL DEFAULT NULL COMMENT '字典类型0为string,1为number',
-  PRIMARY KEY (`id`) USING BTREE
+  `tenant_id` int(10) NULL DEFAULT 0 COMMENT '租户ID',
+  `low_app_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '低代码应用ID',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_sd_dict_code`(`dict_code`) USING BTREE,
+  INDEX `uk_sd_tenant_id`(`tenant_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_dict
 -- ----------------------------
-INSERT INTO `sys_dict` VALUES ('0b5d19e1fce4b2e6647e6b4a17760c14', '通告类型', 'msg_category', '消息类型1:通知公告2:系统消息', 0, 'admin', '2019-04-22 18:01:35', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1174509082208395266', '职务职级', 'position_rank', '职务表职级字典', 0, 'admin', '2019-09-19 10:22:41', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1174511106530525185', '机构类型', 'org_category', '机构类型 1公司，2部门 3岗位', 0, 'admin', '2019-09-19 10:30:43', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1178295274528845826', '表单权限策略', 'form_perms_type', NULL, 0, 'admin', '2019-09-29 21:07:39', 'admin', '2019-09-29 21:08:26', NULL);
-INSERT INTO `sys_dict` VALUES ('1199517671259906049', '紧急程度', 'urgent_level', '日程计划紧急程度', 0, 'admin', '2019-11-27 10:37:53', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1199518099888414722', '日程计划类型', 'eoa_plan_type', NULL, 0, 'admin', '2019-11-27 10:39:36', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1199520177767587841', '分类栏目类型', 'eoa_cms_menu_type', NULL, 0, 'admin', '2019-11-27 10:47:51', 'admin', '2019-11-27 10:49:35', 0);
-INSERT INTO `sys_dict` VALUES ('1199525215290306561', '日程计划状态', 'eoa_plan_status', NULL, 0, 'admin', '2019-11-27 11:07:52', 'admin', '2019-11-27 11:10:11', 0);
-INSERT INTO `sys_dict` VALUES ('1209733563293962241', '数据库类型', 'database_type', NULL, 0, 'admin', '2019-12-25 15:12:12', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1232913193820581889', 'Online表单业务分类', 'ol_form_biz_type', NULL, 0, 'admin', '2020-02-27 14:19:46', 'admin', '2020-02-27 14:20:23', 0);
-INSERT INTO `sys_dict` VALUES ('1250687930947620866', '定时任务状态', 'quartz_status', NULL, 0, 'admin', '2020-04-16 15:30:14', NULL, NULL, NULL);
-INSERT INTO `sys_dict` VALUES ('1280401766745718786', '租户状态', 'tenant_status', '租户状态', 0, 'admin', '2020-07-07 15:22:25', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1356445645198135298', '开关', 'is_open', NULL, 0, 'admin', '2021-02-02 11:33:38', 'admin', '2021-02-02 15:28:12', 0);
-INSERT INTO `sys_dict` VALUES ('1415509679443714049', '标签', 'km_dict_business', '标签', 0, 'admin', '2021-07-14 22:13:01', 'admin', '2022-06-01 20:55:02', 0);
-INSERT INTO `sys_dict` VALUES ('1415574243599777794', '分类', 'km_dict_category', '分类目录', 0, 'admin', '2021-07-15 02:29:34', 'admin', '2022-06-01 21:00:46', 0);
-INSERT INTO `sys_dict` VALUES ('1418495479619317761', '入库状态', 'dict_fti_flag', NULL, 0, 'admin', '2021-07-23 03:57:31', 'admin', '2021-07-23 04:04:33', 0);
-INSERT INTO `sys_dict` VALUES ('1420563456950808577', '操作类型', 'dict_doc_visit_type', '操作日志-操作类型', 0, 'admin', '2021-07-29 09:54:56', 'admin', '2021-07-29 10:06:39', 0);
-INSERT INTO `sys_dict` VALUES ('1435461054779015169', '文档状态', 'doc_dict_status', NULL, 0, 'admin', '2021-09-08 12:32:40', 'admin', '2021-09-08 12:46:04', 0);
-INSERT INTO `sys_dict` VALUES ('1435763999777144834', '统计维度', 'dict_statisticsType', NULL, 0, 'admin', '2021-09-09 08:36:27', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1446749054125019137', '是否公开', 'dict_is_open', NULL, 1, 'admin', '2021-10-09 16:07:08', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('1450412344901677057', '公开范围', 'dict_public_remark', '公开方式', 0, 'ceshi', '2021-10-19 18:43:45', 'admin', '2022-06-01 21:00:55', 0);
-INSERT INTO `sys_dict` VALUES ('236e8a4baff0db8c62c00dd95632834f', '同步工作流引擎', 'activiti_sync', '同步工作流引擎', 0, 'admin', '2019-05-15 15:27:33', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('2e02df51611a4b9632828ab7e5338f00', '权限策略', 'perms_type', '权限策略', 0, 'admin', '2019-04-26 18:26:55', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('2f0320997ade5dd147c90130f7218c3e', '推送类别', 'msg_type', NULL, 0, 'admin', '2019-03-17 21:21:32', 'admin', '2019-03-26 19:57:45', 0);
-INSERT INTO `sys_dict` VALUES ('3486f32803bb953e7155dab3513dc68b', '删除状态', 'del_flag', NULL, 0, 'admin', '2019-01-18 21:46:26', 'admin', '2019-03-30 11:17:11', 0);
-INSERT INTO `sys_dict` VALUES ('3d9a351be3436fbefb1307d4cfb49bf2', '性别', 'sex', NULL, 0, NULL, '2019-01-04 14:56:32', 'admin', '2019-03-30 11:28:27', 1);
-INSERT INTO `sys_dict` VALUES ('4274efc2292239b6f000b153f50823ff', '全局权限策略', 'global_perms_type', '全局权限策略', 0, 'admin', '2019-05-10 17:54:05', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('4c03fca6bf1f0299c381213961566349', 'Online图表展示模板', 'online_graph_display_template', 'Online图表展示模板', 0, 'admin', '2019-04-12 17:28:50', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('4c753b5293304e7a445fd2741b46529d', '字典状态', 'dict_item_status', NULL, 0, 'admin', '2020-06-18 23:18:42', 'admin', '2019-03-30 19:33:52', 1);
-INSERT INTO `sys_dict` VALUES ('4d7fec1a7799a436d26d02325eff295e', '优先级', 'priority', '优先级', 0, 'admin', '2019-03-16 17:03:34', 'admin', '2019-04-16 17:39:23', 0);
-INSERT INTO `sys_dict` VALUES ('4e4602b3e3686f0911384e188dc7efb4', '条件规则', 'rule_conditions', NULL, 0, 'admin', '2019-04-01 10:15:03', 'admin', '2019-04-01 10:30:47', 0);
-INSERT INTO `sys_dict` VALUES ('4f69be5f507accea8d5df5f11346181a', '发送消息类型', 'msgType', NULL, 0, 'admin', '2019-04-11 14:27:09', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('68168534ff5065a152bfab275c2136f8', '有效无效状态', 'valid_status', '有效无效状态', 0, 'admin', '2020-09-26 19:21:14', 'admin', '2019-04-26 19:21:23', 0);
-INSERT INTO `sys_dict` VALUES ('6b78e3f59faec1a4750acff08030a79b', '用户类型', 'user_type', NULL, 0, NULL, '2019-01-04 14:59:01', 'admin', '2019-03-18 23:28:18', 0);
-INSERT INTO `sys_dict` VALUES ('72cce0989df68887546746d8f09811aa', 'Online表单类型', 'cgform_table_type', NULL, 0, 'admin', '2019-01-27 10:13:02', 'admin', '2019-03-30 11:37:36', 0);
-INSERT INTO `sys_dict` VALUES ('78bda155fe380b1b3f175f1e88c284c6', '流程状态', 'bpm_status', '流程状态', 0, 'admin', '2019-05-09 16:31:52', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('83bfb33147013cc81640d5fd9eda030c', '日志类型', 'log_type', NULL, 0, 'admin', '2019-03-18 23:22:19', NULL, NULL, 1);
-INSERT INTO `sys_dict` VALUES ('845da5006c97754728bf48b6a10f79cc', '状态', 'status', NULL, 0, 'admin', '2019-03-18 21:45:25', 'admin', '2019-03-18 21:58:25', 0);
-INSERT INTO `sys_dict` VALUES ('880a895c98afeca9d9ac39f29e67c13e', '操作类型', 'operate_type', '操作类型', 0, 'admin', '2019-07-22 10:54:29', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('8dfe32e2d29ea9430a988b3b558bf233', '发布状态', 'send_status', '发布状态', 0, 'admin', '2019-04-16 17:40:42', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('a7adbcd86c37f7dbc9b66945c82ef9e6', '1是0否', 'yn', NULL, 0, 'admin', '2019-05-22 19:29:29', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('a9d9942bd0eccb6e89de92d130ec4c4a', '消息发送状态', 'msgSendStatus', NULL, 0, 'admin', '2019-04-12 18:18:17', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('ac2f7c0c5c5775fcea7e2387bcb22f01', '菜单类型', 'menu_type', NULL, 0, 'admin', '2020-12-18 23:24:32', 'admin', '2019-04-01 15:27:06', 1);
-INSERT INTO `sys_dict` VALUES ('ad7c65ba97c20a6805d5dcdf13cdaf36', 'onlineT类型', 'ceshi_online', NULL, 0, 'admin', '2019-03-22 16:31:49', 'admin', '2019-03-22 16:34:16', 0);
-INSERT INTO `sys_dict` VALUES ('bd1b8bc28e65d6feefefb6f3c79f42fd', 'Online图表数据类型', 'online_graph_data_type', 'Online图表数据类型', 0, 'admin', '2019-04-12 17:24:24', 'admin', '2019-04-12 17:24:57', 0);
-INSERT INTO `sys_dict` VALUES ('c36169beb12de8a71c8683ee7c28a503', '部门状态', 'depart_status', NULL, 0, 'admin', '2019-03-18 21:59:51', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('c5a14c75172783d72cbee6ee7f5df5d1', 'Online图表类型', 'online_graph_type', 'Online图表类型', 0, 'admin', '2019-04-12 17:04:06', NULL, NULL, 0);
-INSERT INTO `sys_dict` VALUES ('d6e1152968b02d69ff358c75b48a6ee1', '流程类型', 'bpm_process_type', NULL, 0, 'admin', '2021-02-22 19:26:54', 'admin', '2019-03-30 18:14:44', 0);
-INSERT INTO `sys_dict` VALUES ('fc6cd58fde2e8481db10d3a1e68ce70c', '用户状态', 'user_status', NULL, 0, 'admin', '2019-03-18 21:57:25', 'admin', '2019-03-18 23:11:58', 1);
+INSERT INTO `sys_dict` VALUES ('0b5d19e1fce4b2e6647e6b4a17760c14', '通告类型', 'msg_category', '消息类型1:通知公告2:系统消息', 0, 'admin', '2019-04-22 18:01:35', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1174509082208395266', '职务职级', 'position_rank', '职务表职级字典', 0, 'admin', '2019-09-19 10:22:41', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1174511106530525185', '机构类型', 'org_category', '机构类型 1公司，2部门 3岗位', 0, 'admin', '2019-09-19 10:30:43', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1178295274528845826', '表单权限策略', 'form_perms_type', NULL, 0, 'admin', '2019-09-29 21:07:39', 'admin', '2019-09-29 21:08:26', NULL, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1199517671259906049', '紧急程度', 'urgent_level', '日程计划紧急程度', 0, 'admin', '2019-11-27 10:37:53', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1199518099888414722', '日程计划类型', 'eoa_plan_type', NULL, 0, 'admin', '2019-11-27 10:39:36', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1199520177767587841', '分类栏目类型', 'eoa_cms_menu_type', NULL, 0, 'admin', '2019-11-27 10:47:51', 'admin', '2019-11-27 10:49:35', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1199525215290306561', '日程计划状态', 'eoa_plan_status', NULL, 0, 'admin', '2019-11-27 11:07:52', 'admin', '2019-11-27 11:10:11', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1209733563293962241', '数据库类型', 'database_type', NULL, 0, 'admin', '2019-12-25 15:12:12', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1232913193820581889', 'Online表单业务分类', 'ol_form_biz_type', NULL, 0, 'admin', '2020-02-27 14:19:46', 'admin', '2020-02-27 14:20:23', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1250687930947620866', '定时任务状态', 'quartz_status', NULL, 0, 'admin', '2020-04-16 15:30:14', NULL, NULL, NULL, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1280401766745718786', '租户状态', 'tenant_status', '租户状态', 0, 'admin', '2020-07-07 15:22:25', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1356445645198135298', '开关', 'is_open', NULL, 0, 'admin', '2021-02-02 11:33:38', 'admin', '2021-02-02 15:28:12', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1415509679443714049', '标签', 'km_dict_business', '标签', 0, 'admin', '2021-07-14 22:13:01', 'admin', '2022-06-01 20:55:02', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1415574243599777794', '分类', 'km_dict_category', '分类目录', 0, 'admin', '2021-07-15 02:29:34', 'admin', '2022-06-01 21:00:46', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1418495479619317761', '入库状态', 'dict_fti_flag', NULL, 0, 'admin', '2021-07-23 03:57:31', 'admin', '2021-07-23 04:04:33', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1420563456950808577', '操作类型', 'dict_doc_visit_type', '操作日志-操作类型', 0, 'admin', '2021-07-29 09:54:56', 'admin', '2021-07-29 10:06:39', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1435461054779015169', '文档状态', 'doc_dict_status', NULL, 0, 'admin', '2021-09-08 12:32:40', 'admin', '2021-09-08 12:46:04', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1435763999777144834', '统计维度', 'dict_statisticsType', NULL, 0, 'admin', '2021-09-09 08:36:27', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1446749054125019137', '是否公开', 'dict_is_open', NULL, 1, 'admin', '2021-10-09 16:07:08', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('1450412344901677057', '公开范围', 'dict_public_remark', '公开方式', 0, 'ceshi', '2021-10-19 18:43:45', 'admin', '2022-06-01 21:00:55', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('236e8a4baff0db8c62c00dd95632834f', '同步工作流引擎', 'activiti_sync', '同步工作流引擎', 0, 'admin', '2019-05-15 15:27:33', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('2e02df51611a4b9632828ab7e5338f00', '权限策略', 'perms_type', '权限策略', 0, 'admin', '2019-04-26 18:26:55', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('2f0320997ade5dd147c90130f7218c3e', '推送类别', 'msg_type', NULL, 0, 'admin', '2019-03-17 21:21:32', 'admin', '2019-03-26 19:57:45', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('3486f32803bb953e7155dab3513dc68b', '删除状态', 'del_flag', NULL, 0, 'admin', '2019-01-18 21:46:26', 'admin', '2019-03-30 11:17:11', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('3d9a351be3436fbefb1307d4cfb49bf2', '性别', 'sex', NULL, 0, NULL, '2019-01-04 14:56:32', 'admin', '2019-03-30 11:28:27', 1, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('4274efc2292239b6f000b153f50823ff', '全局权限策略', 'global_perms_type', '全局权限策略', 0, 'admin', '2019-05-10 17:54:05', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('4c03fca6bf1f0299c381213961566349', 'Online图表展示模板', 'online_graph_display_template', 'Online图表展示模板', 0, 'admin', '2019-04-12 17:28:50', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('4c753b5293304e7a445fd2741b46529d', '字典状态', 'dict_item_status', NULL, 0, 'admin', '2020-06-18 23:18:42', 'admin', '2019-03-30 19:33:52', 1, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('4d7fec1a7799a436d26d02325eff295e', '优先级', 'priority', '优先级', 0, 'admin', '2019-03-16 17:03:34', 'admin', '2019-04-16 17:39:23', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('4e4602b3e3686f0911384e188dc7efb4', '条件规则', 'rule_conditions', NULL, 0, 'admin', '2019-04-01 10:15:03', 'admin', '2019-04-01 10:30:47', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('4f69be5f507accea8d5df5f11346181a', '发送消息类型', 'msgType', NULL, 0, 'admin', '2019-04-11 14:27:09', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('68168534ff5065a152bfab275c2136f8', '有效无效状态', 'valid_status', '有效无效状态', 0, 'admin', '2020-09-26 19:21:14', 'admin', '2019-04-26 19:21:23', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('6b78e3f59faec1a4750acff08030a79b', '用户类型', 'user_type', NULL, 0, NULL, '2019-01-04 14:59:01', 'admin', '2019-03-18 23:28:18', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('72cce0989df68887546746d8f09811aa', 'Online表单类型', 'cgform_table_type', NULL, 0, 'admin', '2019-01-27 10:13:02', 'admin', '2019-03-30 11:37:36', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('78bda155fe380b1b3f175f1e88c284c6', '流程状态', 'bpm_status', '流程状态', 0, 'admin', '2019-05-09 16:31:52', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('83bfb33147013cc81640d5fd9eda030c', '日志类型', 'log_type', NULL, 0, 'admin', '2019-03-18 23:22:19', NULL, NULL, 1, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('845da5006c97754728bf48b6a10f79cc', '状态', 'status', NULL, 0, 'admin', '2019-03-18 21:45:25', 'admin', '2019-03-18 21:58:25', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('880a895c98afeca9d9ac39f29e67c13e', '操作类型', 'operate_type', '操作类型', 0, 'admin', '2019-07-22 10:54:29', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('8dfe32e2d29ea9430a988b3b558bf233', '发布状态', 'send_status', '发布状态', 0, 'admin', '2019-04-16 17:40:42', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('a7adbcd86c37f7dbc9b66945c82ef9e6', '1是0否', 'yn', NULL, 0, 'admin', '2019-05-22 19:29:29', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('a9d9942bd0eccb6e89de92d130ec4c4a', '消息发送状态', 'msgSendStatus', NULL, 0, 'admin', '2019-04-12 18:18:17', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('ac2f7c0c5c5775fcea7e2387bcb22f01', '菜单类型', 'menu_type', NULL, 0, 'admin', '2020-12-18 23:24:32', 'admin', '2019-04-01 15:27:06', 1, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('ad7c65ba97c20a6805d5dcdf13cdaf36', 'onlineT类型', 'ceshi_online', NULL, 0, 'admin', '2019-03-22 16:31:49', 'admin', '2019-03-22 16:34:16', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('bd1b8bc28e65d6feefefb6f3c79f42fd', 'Online图表数据类型', 'online_graph_data_type', 'Online图表数据类型', 0, 'admin', '2019-04-12 17:24:24', 'admin', '2019-04-12 17:24:57', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('c36169beb12de8a71c8683ee7c28a503', '部门状态', 'depart_status', NULL, 0, 'admin', '2019-03-18 21:59:51', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('c5a14c75172783d72cbee6ee7f5df5d1', 'Online图表类型', 'online_graph_type', 'Online图表类型', 0, 'admin', '2019-04-12 17:04:06', NULL, NULL, 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('d6e1152968b02d69ff358c75b48a6ee1', '流程类型', 'bpm_process_type', NULL, 0, 'admin', '2021-02-22 19:26:54', 'admin', '2019-03-30 18:14:44', 0, 0, NULL);
+INSERT INTO `sys_dict` VALUES ('fc6cd58fde2e8481db10d3a1e68ce70c', '用户状态', 'user_status', NULL, 0, 'admin', '2019-03-18 21:57:25', 'admin', '2019-03-18 23:11:58', 1, 0, NULL);
 
 -- ----------------------------
 -- Table structure for sys_dict_item
@@ -824,187 +850,193 @@ CREATE TABLE `sys_dict_item`  (
   `dict_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '字典id',
   `item_text` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '字典项文本',
   `item_value` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '字典项值',
+  `item_color` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '字典项颜色',
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
   `sort_order` decimal(11, 0) NULL DEFAULT NULL COMMENT '排序',
   `status` decimal(11, 0) NULL DEFAULT NULL COMMENT '状态（1启用 0不启用）',
   `create_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `create_time` datetime(0) NULL DEFAULT NULL,
   `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `update_time` datetime(0) NULL DEFAULT NULL
+  `update_time` datetime(0) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sditem_role_dict_id`(`dict_id`) USING BTREE,
+  INDEX `idx_sditem_role_sort_order`(`sort_order`) USING BTREE,
+  INDEX `idx_sditem_status`(`status`) USING BTREE,
+  INDEX `idx_sditem_dict_val`(`dict_id`, `item_value`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_dict_item
 -- ----------------------------
-INSERT INTO `sys_dict_item` VALUES ('f16c5706f3ae05c57a53850c64ce7c45', 'a9d9942bd0eccb6e89de92d130ec4c4a', '发送成功', '1', NULL, 2, 1, 'admin', '2019-04-12 18:19:43', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('f2a7920421f3335afdf6ad2b342f6b5d', '845da5006c97754728bf48b6a10f79cc', '冻结', '2', NULL, NULL, 1, 'admin', '2019-03-18 21:46:02', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('f37f90c496ec9841c4c326b065e00bb2', '83bfb33147013cc81640d5fd9eda030c', '登录日志', '1', NULL, NULL, 1, 'admin', '2019-03-18 23:22:37', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('f753aff60ff3931c0ecb4812d8b5e643', '4c03fca6bf1f0299c381213961566349', '双排布局', 'double', NULL, 3, 1, 'admin', '2019-04-12 17:43:51', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('f80a8f6838215753b05e1a5ba3346d22', '880a895c98afeca9d9ac39f29e67c13e', '删除', '4', NULL, 4, 1, 'admin', '2019-07-22 10:55:14', 'admin', '2019-07-22 10:55:30');
-INSERT INTO `sys_dict_item` VALUES ('fcec03570f68a175e1964808dc3f1c91', '4c03fca6bf1f0299c381213961566349', 'Tab风格', 'tab', NULL, 1, 1, 'admin', '2019-04-12 17:43:31', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('fe50b23ae5e68434def76f67cef35d2d', '78bda155fe380b1b3f175f1e88c284c6', '已作废', '4', '已作废', 4, 1, 'admin', '2021-09-09 16:33:43', 'admin', '2019-05-09 16:34:40');
-INSERT INTO `sys_dict_item` VALUES ('1420564005536411661', '1420563456950808577', '修改', '6', '修改', 6, 1, 'admin', '2021-07-29 09:57:06', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1420564005536411664', '1420563456950808577', '删除', '7', '删除', 7, 1, 'admin', '2021-07-29 09:57:06', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1450412465588580354', '1450412344901677057', '本部门公开', '1', '本部门与下级部门可见', 2, 1, NULL, '2021-10-19 18:44:14', 'admin', '2022-06-01 20:54:15');
-INSERT INTO `sys_dict_item` VALUES ('1450412578524409857', '1450412344901677057', '所有部门', '0', '所有部门公开可见', 2, 1, NULL, '2021-10-19 18:44:41', 'admin', '2022-06-01 20:54:32');
-INSERT INTO `sys_dict_item` VALUES ('0072d115e07c875d76c9b022e2179128', '4d7fec1a7799a436d26d02325eff295e', '低', 'L', '低', 3, 1, 'admin', '2019-04-16 17:04:59', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('05a2e732ce7b00aa52141ecc3e330b4e', '3486f32803bb953e7155dab3513dc68b', '已删除', '1', NULL, NULL, 1, 'admin', '2025-10-18 21:46:56', 'admin', '2019-03-28 22:23:20');
-INSERT INTO `sys_dict_item` VALUES ('096c2e758d823def3855f6376bc736fb', 'bd1b8bc28e65d6feefefb6f3c79f42fd', 'SQL', 'sql', NULL, 1, 1, 'admin', '2019-04-12 17:26:26', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('0c9532916f5cd722017b46bc4d953e41', '2f0320997ade5dd147c90130f7218c3e', '指定用户', 'USER', NULL, NULL, 1, 'admin', '2019-03-17 21:22:19', 'admin', '2019-03-17 21:22:28');
-INSERT INTO `sys_dict_item` VALUES ('0ca4beba9efc4f9dd54af0911a946d5c', '72cce0989df68887546746d8f09811aa', '附表', '3', NULL, 3, 1, 'admin', '2019-03-27 10:13:43', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1030a2652608f5eac3b49d70458b8532', '2e02df51611a4b9632828ab7e5338f00', '禁用', '2', '禁用', 2, 1, 'admin', '2021-03-26 18:27:28', 'admin', '2019-04-26 18:39:11');
-INSERT INTO `sys_dict_item` VALUES ('1174509082208395266', '1174511106530525185', '岗位', '3', '岗位', 1, 1, 'admin', '2019-09-19 10:31:16', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1174509601047994369', '1174509082208395266', '员级', '1', NULL, 1, 1, 'admin', '2019-09-19 10:24:45', 'admin', '2019-09-23 11:46:39');
-INSERT INTO `sys_dict_item` VALUES ('1174509667297026049', '1174509082208395266', '助级', '2', NULL, 2, 1, 'admin', '2019-09-19 10:25:01', 'admin', '2019-09-23 11:46:47');
-INSERT INTO `sys_dict_item` VALUES ('1174509713568587777', '1174509082208395266', '中级', '3', NULL, 3, 1, 'admin', '2019-09-19 10:25:12', 'admin', '2019-09-23 11:46:56');
-INSERT INTO `sys_dict_item` VALUES ('1174509788361416705', '1174509082208395266', '副高级', '4', NULL, 4, 1, 'admin', '2019-09-19 10:25:30', 'admin', '2019-09-23 11:47:06');
-INSERT INTO `sys_dict_item` VALUES ('1174509835803189250', '1174509082208395266', '正高级', '5', NULL, 5, 1, 'admin', '2019-09-19 10:25:41', 'admin', '2019-09-23 11:47:12');
-INSERT INTO `sys_dict_item` VALUES ('1174511197735665665', '1174511106530525185', '公司', '1', '公司', 1, 1, 'admin', '2019-09-19 10:31:05', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1174511244036587521', '1174511106530525185', '部门', '2', '部门', 1, 1, 'admin', '2019-09-19 10:31:16', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1178295553450061826', '1178295274528845826', '可编辑(未授权禁用)', '2', NULL, 2, 1, 'admin', '2019-09-29 21:08:46', 'admin', '2019-09-29 21:09:18');
-INSERT INTO `sys_dict_item` VALUES ('1178295639554928641', '1178295274528845826', '可见(未授权不可见)', '1', NULL, 1, 1, 'admin', '2019-09-29 21:09:06', 'admin', '2019-09-29 21:09:24');
-INSERT INTO `sys_dict_item` VALUES ('1199517884758368257', '1199517671259906049', '一般', '1', NULL, 1, 1, 'admin', '2019-11-27 10:38:44', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199517914017832962', '1199517671259906049', '重要', '2', NULL, 1, 1, 'admin', '2019-11-27 10:38:51', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199517941339529217', '1199517671259906049', '紧急', '3', NULL, 1, 1, 'admin', '2019-11-27 10:38:58', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199518186144276482', '1199518099888414722', '日常记录', '1', NULL, 1, 1, 'admin', '2019-11-27 10:39:56', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199518214858481666', '1199518099888414722', '本周工作', '2', NULL, 1, 1, 'admin', '2019-11-27 10:40:03', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199518235943247874', '1199518099888414722', '下周计划', '3', NULL, 1, 1, 'admin', '2019-11-27 10:40:08', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199520817285701634', '1199520177767587841', '列表', '1', NULL, 1, 1, 'admin', '2019-11-27 10:50:24', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199520835035996161', '1199520177767587841', '链接', '2', NULL, 1, 1, 'admin', '2019-11-27 10:50:28', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199525468672405505', '1199525215290306561', '未开始', '0', NULL, 1, 1, 'admin', '2019-11-27 11:08:52', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199525490575060993', '1199525215290306561', '进行中', '1', NULL, 1, 1, 'admin', '2019-11-27 11:08:58', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1199525506429530114', '1199525215290306561', '已完成', '2', NULL, 1, 1, 'admin', '2019-11-27 11:09:02', 'admin', '2019-11-27 11:10:02');
-INSERT INTO `sys_dict_item` VALUES ('1199607547704647681', '4f69be5f507accea8d5df5f11346181a', '系统', '4', NULL, 1, 1, 'admin', '2019-11-27 16:35:02', 'admin', '2019-11-27 19:37:46');
-INSERT INTO `sys_dict_item` VALUES ('1209733775114702850', '1209733563293962241', 'MySQL5.5', '1', NULL, 1, 1, 'admin', '2019-12-25 15:13:02', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1209733839933476865', '1209733563293962241', 'Oracle', '2', NULL, 3, 1, 'admin', '2019-12-25 15:13:18', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1209733903020003330', '1209733563293962241', 'SQLServer', '3', NULL, 4, 1, 'admin', '2019-12-25 15:13:33', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1232913424813486081', '1232913193820581889', '官方示例', 'demo', NULL, 1, 1, 'admin', '2020-02-27 14:20:42', 'admin', '2020-02-27 14:21:37');
-INSERT INTO `sys_dict_item` VALUES ('1232913493717512194', '1232913193820581889', '流程表单', 'bpm', NULL, 2, 1, 'admin', '2020-02-27 14:20:58', 'admin', '2020-02-27 14:22:20');
-INSERT INTO `sys_dict_item` VALUES ('1232913605382467585', '1232913193820581889', '测试表单', 'temp', NULL, 4, 1, 'admin', '2020-02-27 14:21:25', 'admin', '2020-02-27 14:22:16');
-INSERT INTO `sys_dict_item` VALUES ('1232914232372195330', '1232913193820581889', '导入表单', 'bdfl_include', NULL, 5, 1, 'admin', '2020-02-27 14:23:54', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1234371726545010689', '4e4602b3e3686f0911384e188dc7efb4', '左模糊', 'LEFT_LIKE', '左模糊', 7, 1, 'admin', '2020-03-02 14:55:27', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1234371809495760898', '4e4602b3e3686f0911384e188dc7efb4', '右模糊', 'RIGHT_LIKE', '右模糊', 7, 1, 'admin', '2020-03-02 14:55:47', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1250688147579228161', '1250687930947620866', '正常', '0', NULL, 1, 1, 'admin', '2020-04-16 15:31:05', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1250688201064992770', '1250687930947620866', '停止', '-1', NULL, 1, 1, 'admin', '2020-04-16 15:31:18', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1280401815068295170', '1280401766745718786', '正常', '1', NULL, 1, 1, 'admin', '2020-07-07 15:22:36', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1280401847607705602', '1280401766745718786', '冻结', '0', NULL, 1, 1, 'admin', '2020-07-07 15:22:44', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1305827309355302914', 'bd1b8bc28e65d6feefefb6f3c79f42fd', 'API', 'api', NULL, 3, 1, 'admin', '2020-09-15 19:14:26', 'admin', '2020-09-15 19:14:41');
-INSERT INTO `sys_dict_item` VALUES ('1334440962954936321', '1209733563293962241', 'MYSQL5.7', '4', NULL, 1, 1, 'admin', '2020-12-03 18:16:02', 'admin', '2020-12-03 18:16:02');
-INSERT INTO `sys_dict_item` VALUES ('1356445705549975553', '1356445645198135298', '是', 'Y', NULL, 1, 1, 'admin', '2021-02-02 11:33:52', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1356445754212290561', '1356445645198135298', '否', 'N', NULL, 1, 1, 'admin', '2021-02-02 11:34:04', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1415510117652013057', '1415509679443714049', '干货', '1', '', 1, 1, 'admin', '2021-07-14 22:14:46', 'admin', '2022-06-01 20:55:30');
-INSERT INTO `sys_dict_item` VALUES ('1415512755764371457', '1415509679443714049', '重点', '2', '', 1, 1, 'admin', '2021-07-14 22:25:15', 'admin', '2022-06-01 20:55:37');
-INSERT INTO `sys_dict_item` VALUES ('1415512840657084418', '1415509679443714049', '最新', '3', '', 1, 1, 'admin', '2021-07-14 22:25:35', 'admin', '2022-06-01 20:55:44');
-INSERT INTO `sys_dict_item` VALUES ('1415512908009218049', '1415509679443714049', '实用', '4', '', 1, 1, 'admin', '2021-07-14 22:25:51', 'admin', '2022-06-01 20:55:54');
-INSERT INTO `sys_dict_item` VALUES ('1415512988313362433', '1415509679443714049', '名师', '5', '', 1, 1, 'admin', '2021-07-14 22:26:10', 'admin', '2022-06-01 20:56:03');
-INSERT INTO `sys_dict_item` VALUES ('1415513052456853505', '1415509679443714049', '经典', '6', '', 1, 1, 'admin', '2021-07-14 22:26:25', 'admin', '2022-06-01 20:56:31');
-INSERT INTO `sys_dict_item` VALUES ('1415513104826933249', '1415509679443714049', '理论', '7', '', 1, 1, 'admin', '2021-07-14 22:26:38', 'admin', '2022-06-01 20:56:40');
-INSERT INTO `sys_dict_item` VALUES ('1415518346117292034', '1415509679443714049', '实操', '8', '', 1, 1, 'admin', '2021-07-14 22:47:27', 'admin', '2022-06-01 20:56:50');
-INSERT INTO `sys_dict_item` VALUES ('1415518423493812226', '1415509679443714049', '潮流', '9', '', 1, 1, 'admin', '2021-07-14 22:47:46', 'admin', '2022-06-01 20:57:04');
-INSERT INTO `sys_dict_item` VALUES ('1415518535649501185', '1415509679443714049', '必考', '10', '', 1, 1, 'admin', '2021-07-14 22:48:13', 'admin', '2022-06-01 20:57:12');
-INSERT INTO `sys_dict_item` VALUES ('1415518651982716929', '1415509679443714049', '进修', '11', '', 1, 1, 'admin', '2021-07-14 22:48:40', 'admin', '2022-06-01 20:58:11');
-INSERT INTO `sys_dict_item` VALUES ('1415518739014524929', '1415509679443714049', '继续教育', '12', '', 1, 1, 'admin', '2021-07-14 22:49:01', 'admin', '2022-06-01 20:58:42');
-INSERT INTO `sys_dict_item` VALUES ('1415518946661933057', '1415509679443714049', '实践', '14', '', 1, 1, 'admin', '2021-07-14 22:49:51', 'admin', '2022-06-01 20:58:33');
-INSERT INTO `sys_dict_item` VALUES ('1415519089138245634', '1415509679443714049', '付费', '15', '', 3, 1, 'admin', '2021-07-14 22:50:25', 'admin', '2022-06-01 20:59:12');
-INSERT INTO `sys_dict_item` VALUES ('1415519478847807490', '1415509679443714049', '入门', '19', '', 11, 1, 'admin', '2021-07-14 22:51:57', 'admin', '2022-06-01 20:58:18');
-INSERT INTO `sys_dict_item` VALUES ('1415574342098812929', '1415574243599777794', '编程', '1', '', 1, 1, 'admin', '2021-07-15 02:29:58', 'admin', '2022-03-29 15:13:08');
-INSERT INTO `sys_dict_item` VALUES ('1415574391214112769', '1415574243599777794', '数据库', '2', '', 1, 1, 'admin', '2021-07-15 02:30:10', 'admin', '2022-03-29 15:13:14');
-INSERT INTO `sys_dict_item` VALUES ('1415574432960020481', '1415574243599777794', '架构', '3', '', 1, 1, 'admin', '2021-07-15 02:30:20', 'admin', '2022-03-29 15:13:20');
-INSERT INTO `sys_dict_item` VALUES ('1415574502241533954', '1415574243599777794', '前端', '4', '', 1, 1, 'admin', '2021-07-15 02:30:36', 'admin', '2022-03-29 15:13:28');
-INSERT INTO `sys_dict_item` VALUES ('1415574564849909762', '1415574243599777794', 'UI设计', '5', '', 1, 1, 'admin', '2021-07-15 02:30:51', 'admin', '2022-03-29 15:13:36');
-INSERT INTO `sys_dict_item` VALUES ('1415574697549299713', '1415574243599777794', '中间件', '7', '', 1, 1, 'admin', '2021-07-15 02:31:23', 'admin', '2022-03-29 15:14:17');
-INSERT INTO `sys_dict_item` VALUES ('1418496971277398018', '1418495479619317761', '入库失败', '-1', NULL, 1, 1, 'admin', '2021-07-23 04:03:27', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1418497014818467842', '1418495479619317761', '等待入库', '0', NULL, 1, 1, 'admin', '2021-07-23 04:03:37', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1418497058619584514', '1418495479619317761', '已入库', '1', NULL, 1, 1, 'admin', '2021-07-23 04:03:48', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1418497118333890561', '1418495479619317761', '不需要入库', '2', NULL, 1, 1, 'admin', '2021-07-23 04:04:02', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1420563600144347137', '1420563456950808577', '上传', '0', '上传', 0, 1, 'admin', '2021-07-29 09:55:30', 'admin', '2021-07-29 09:55:57');
-INSERT INTO `sys_dict_item` VALUES ('1420563682348511233', '1420563456950808577', '审核通过', '1', '审核通过', 1, 1, 'admin', '2021-07-29 09:55:49', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1420563785893294082', '1420563456950808577', '审核拒绝', '2', '审核拒绝', 2, 1, 'admin', '2021-07-29 09:56:14', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1420563852746305538', '1420563456950808577', '修改预览文档', '3', '修改预览文档', 3, 1, 'admin', '2021-07-29 09:56:30', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1420563930554839041', '1420563456950808577', '下载', '4', '下载', 4, 1, 'admin', '2021-07-29 09:56:49', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1420564005536411650', '1420563456950808577', '预览', '5', '预览', 5, 1, 'admin', '2021-07-29 09:57:06', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435461449668542466', '1435461054779015169', '草稿', '0', NULL, 1, 1, 'admin', '2021-09-08 12:34:14', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435461470677811202', '1435461054779015169', '待审核', '1', NULL, 1, 1, 'admin', '2021-09-08 12:34:19', 'admin', '2021-09-08 12:35:03');
-INSERT INTO `sys_dict_item` VALUES ('1435461526139092994', '1435461054779015169', '审核通过', '2', NULL, 1, 1, 'admin', '2021-09-08 12:34:32', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435461599442944002', '1435461054779015169', '审核驳回', '3', NULL, 1, 1, 'admin', '2021-09-08 12:34:50', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435764110502576129', '1435763999777144834', '分类', '1', NULL, 1, 1, 'admin', '2021-09-09 08:36:54', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435764144711319554', '1435763999777144834', '状态', '2', NULL, 1, 1, 'admin', '2021-09-09 08:37:02', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435764240131735554', '1435763999777144834', '标签', '4', NULL, 1, 1, 'admin', '2021-09-09 08:37:25', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1435764293730746370', '1435763999777144834', '知识专题', '5', NULL, 1, 1, 'admin', '2021-09-09 08:37:37', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1446749165269880833', '1446749054125019137', '公开', '0', NULL, 1, 1, 'admin', '2021-10-09 16:07:35', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1446749218503987201', '1446749054125019137', '不公开', '1', NULL, 1, 1, 'admin', '2021-10-09 16:07:48', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('147c48ff4b51545032a9119d13f3222a', 'd6e1152968b02d69ff358c75b48a6ee1', '测试流程', 'test', NULL, 1, 1, 'admin', '2019-03-22 19:27:05', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1543fe7e5e26fb97cdafe4981bedc0c8', '4c03fca6bf1f0299c381213961566349', '单排布局', 'single', NULL, 2, 1, 'admin', '2022-07-12 17:43:39', 'admin', '2019-04-12 17:43:57');
-INSERT INTO `sys_dict_item` VALUES ('1ce390c52453891f93514c1bd2795d44', 'ad7c65ba97c20a6805d5dcdf13cdaf36', '000', '00', NULL, 1, 1, 'admin', '2019-03-22 16:34:34', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('1db531bcff19649fa82a644c8a939dc4', '4c03fca6bf1f0299c381213961566349', '组合布局', 'combination', NULL, 4, 1, 'admin', '2019-05-11 16:07:08', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('222705e11ef0264d4214affff1fb4ff9', '4f69be5f507accea8d5df5f11346181a', '短信', '1', NULL, 1, 1, 'admin', '2023-02-28 10:50:36', 'admin', '2019-04-28 10:58:11');
-INSERT INTO `sys_dict_item` VALUES ('23a5bb76004ed0e39414e928c4cde155', '4e4602b3e3686f0911384e188dc7efb4', '不等于', '!=', '不等于', 3, 1, 'admin', '2019-04-01 16:46:15', 'admin', '2019-04-01 17:48:40');
-INSERT INTO `sys_dict_item` VALUES ('25847e9cb661a7c711f9998452dc09e6', '4e4602b3e3686f0911384e188dc7efb4', '小于等于', '<=', '小于等于', 6, 1, 'admin', '2019-04-01 16:44:34', 'admin', '2019-04-01 17:49:10');
-INSERT INTO `sys_dict_item` VALUES ('2d51376643f220afdeb6d216a8ac2c01', '68168534ff5065a152bfab275c2136f8', '有效', '1', '有效', 2, 1, 'admin', '2019-04-26 19:22:01', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('308c8aadf0c37ecdde188b97ca9833f5', '8dfe32e2d29ea9430a988b3b558bf233', '已发布', '1', '已发布', 2, 1, 'admin', '2019-04-16 17:41:24', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('333e6b2196e01ef9a5f76d74e86a6e33', '8dfe32e2d29ea9430a988b3b558bf233', '未发布', '0', '未发布', 1, 1, 'admin', '2019-04-16 17:41:12', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('337ea1e401bda7233f6258c284ce4f50', 'bd1b8bc28e65d6feefefb6f3c79f42fd', 'JSON', 'json', NULL, 1, 1, 'admin', '2019-04-12 17:26:33', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('33bc9d9f753cf7dc40e70461e50fdc54', 'a9d9942bd0eccb6e89de92d130ec4c4a', '发送失败', '2', NULL, 3, 1, 'admin', '2019-04-12 18:20:02', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('3fbc03d6c994ae06d083751248037c0e', '78bda155fe380b1b3f175f1e88c284c6', '已完成', '3', '已完成', 3, 1, 'admin', '2019-05-09 16:33:25', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('41d7aaa40c9b61756ffb1f28da5ead8e', '0b5d19e1fce4b2e6647e6b4a17760c14', '通知公告', '1', NULL, 1, 1, 'admin', '2019-04-22 18:01:57', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('41fa1e9571505d643aea87aeb83d4d76', '4e4602b3e3686f0911384e188dc7efb4', '等于', '=', '等于', 4, 1, 'admin', '2019-04-01 16:45:24', 'admin', '2019-04-01 17:49:00');
-INSERT INTO `sys_dict_item` VALUES ('43d2295b8610adce9510ff196a49c6e9', '845da5006c97754728bf48b6a10f79cc', '正常', '1', NULL, NULL, 1, 'admin', '2019-03-18 21:45:51', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('4f05fb5376f4c61502c5105f52e4dd2b', '83bfb33147013cc81640d5fd9eda030c', '操作日志', '2', NULL, NULL, 1, 'admin', '2019-03-18 23:22:49', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('50223341bfb5ba30bf6319789d8d17fe', 'd6e1152968b02d69ff358c75b48a6ee1', '业务办理', 'business', NULL, 3, 1, 'admin', '2023-04-22 19:28:05', 'admin', '2019-03-22 23:24:39');
-INSERT INTO `sys_dict_item` VALUES ('51222413e5906cdaf160bb5c86fb827c', 'a7adbcd86c37f7dbc9b66945c82ef9e6', '是', '1', NULL, 1, 1, 'admin', '2019-05-22 19:29:45', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('538fca35afe004972c5f3947c039e766', '2e02df51611a4b9632828ab7e5338f00', '显示', '1', '显示', 1, 1, 'admin', '2025-03-26 18:27:13', 'admin', '2019-04-26 18:39:07');
-INSERT INTO `sys_dict_item` VALUES ('5584c21993bde231bbde2b966f2633ac', '4e4602b3e3686f0911384e188dc7efb4', '自定义SQL表达式', 'USE_SQL_RULES', '自定义SQL表达式', 9, 1, 'admin', '2019-04-01 10:45:24', 'admin', '2019-04-01 17:49:27');
-INSERT INTO `sys_dict_item` VALUES ('58b73b344305c99b9d8db0fc056bbc0a', '72cce0989df68887546746d8f09811aa', '主表', '2', NULL, 2, 1, 'admin', '2019-03-27 10:13:36', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('5b65a88f076b32e8e69d19bbaadb52d5', '2f0320997ade5dd147c90130f7218c3e', '全体用户', 'ALL', NULL, NULL, 1, 'admin', '2020-10-17 21:22:43', 'admin', '2019-03-28 22:17:09');
-INSERT INTO `sys_dict_item` VALUES ('5d833f69296f691843ccdd0c91212b6b', '880a895c98afeca9d9ac39f29e67c13e', '修改', '3', NULL, 3, 1, 'admin', '2019-07-22 10:55:07', 'admin', '2019-07-22 10:55:41');
-INSERT INTO `sys_dict_item` VALUES ('5d84a8634c8fdfe96275385075b105c9', '3d9a351be3436fbefb1307d4cfb49bf2', '女', '2', NULL, 2, 1, NULL, '2019-01-04 14:56:56', NULL, '2019-01-04 17:38:12');
-INSERT INTO `sys_dict_item` VALUES ('66c952ae2c3701a993e7db58f3baf55e', '4e4602b3e3686f0911384e188dc7efb4', '大于', '>', '大于', 1, 1, 'admin', '2019-04-01 10:45:46', 'admin', '2019-04-01 17:48:29');
-INSERT INTO `sys_dict_item` VALUES ('6937c5dde8f92e9a00d4e2ded9198694', 'ad7c65ba97c20a6805d5dcdf13cdaf36', 'easyui', '3', NULL, 1, 1, 'admin', '2019-03-22 16:32:15', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('69cacf64e244100289ddd4aa9fa3b915', 'a9d9942bd0eccb6e89de92d130ec4c4a', '未发送', '0', NULL, 1, 1, 'admin', '2019-04-12 18:19:23', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('6a7a9e1403a7943aba69e54ebeff9762', '4f69be5f507accea8d5df5f11346181a', '邮件', '2', NULL, 2, 1, 'admin', '2031-02-28 10:50:44', 'admin', '2019-04-28 10:59:03');
-INSERT INTO `sys_dict_item` VALUES ('6c682d78ddf1715baf79a1d52d2aa8c2', '72cce0989df68887546746d8f09811aa', '单表', '1', NULL, 1, 1, 'admin', '2019-03-27 10:13:29', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('6d404fd2d82311fbc87722cd302a28bc', '4e4602b3e3686f0911384e188dc7efb4', '模糊', 'LIKE', '模糊', 7, 1, 'admin', '2019-04-01 16:46:02', 'admin', '2019-04-01 17:49:20');
-INSERT INTO `sys_dict_item` VALUES ('6d4e26e78e1a09699182e08516c49fc4', '4d7fec1a7799a436d26d02325eff295e', '高', 'H', '高', 1, 1, 'admin', '2019-04-16 17:04:24', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('700e9f030654f3f90e9ba76ab0713551', '6b78e3f59faec1a4750acff08030a79b', '333', '333', NULL, NULL, 1, 'admin', '2019-02-21 19:59:47', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('7050c1522702bac3be40e3b7d2e1dfd8', 'c5a14c75172783d72cbee6ee7f5df5d1', '柱状图', 'bar', NULL, 1, 1, 'admin', '2019-04-12 17:05:17', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('71b924faa93805c5c1579f12e001c809', 'd6e1152968b02d69ff358c75b48a6ee1', 'OA办公', 'oa', NULL, 2, 1, 'admin', '2021-03-22 19:27:17', 'admin', '2019-03-22 23:24:36');
-INSERT INTO `sys_dict_item` VALUES ('75b260d7db45a39fc7f21badeabdb0ed', 'c36169beb12de8a71c8683ee7c28a503', '不启用', '0', NULL, NULL, 1, 'admin', '2019-03-18 23:29:41', 'admin', '2019-03-18 23:29:54');
-INSERT INTO `sys_dict_item` VALUES ('7688469db4a3eba61e6e35578dc7c2e5', 'c36169beb12de8a71c8683ee7c28a503', '启用', '1', NULL, NULL, 1, 'admin', '2019-03-18 23:29:28', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('78ea6cadac457967a4b1c4eb7aaa418c', 'fc6cd58fde2e8481db10d3a1e68ce70c', '正常', '1', NULL, NULL, 1, 'admin', '2019-03-18 23:30:28', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('7ccf7b80c70ee002eceb3116854b75cb', 'ac2f7c0c5c5775fcea7e2387bcb22f01', '按钮权限', '2', NULL, NULL, 1, 'admin', '2019-03-18 23:25:40', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('81fb2bb0e838dc68b43f96cc309f8257', 'fc6cd58fde2e8481db10d3a1e68ce70c', '冻结', '2', NULL, NULL, 1, 'admin', '2019-03-18 23:30:37', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('83250269359855501ec4e9c0b7e21596', '4274efc2292239b6f000b153f50823ff', '可见/可访问(授权后可见/可访问)', '1', NULL, 1, 1, 'admin', '2019-05-10 17:54:51', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('84778d7e928bc843ad4756db1322301f', '4e4602b3e3686f0911384e188dc7efb4', '大于等于', '>=', '大于等于', 5, 1, 'admin', '2019-04-01 10:46:02', 'admin', '2019-04-01 17:49:05');
-INSERT INTO `sys_dict_item` VALUES ('848d4da35ebd93782029c57b103e5b36', 'c5a14c75172783d72cbee6ee7f5df5d1', '饼图', 'pie', NULL, 3, 1, 'admin', '2019-04-12 17:05:49', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('84dfc178dd61b95a72900fcdd624c471', '78bda155fe380b1b3f175f1e88c284c6', '处理中', '2', '处理中', 2, 1, 'admin', '2019-05-09 16:33:01', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('86f19c7e0a73a0bae451021ac05b99dd', 'ac2f7c0c5c5775fcea7e2387bcb22f01', '子菜单', '1', NULL, NULL, 1, 'admin', '2019-03-18 23:25:27', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('8bccb963e1cd9e8d42482c54cc609ca2', '4f69be5f507accea8d5df5f11346181a', '微信', '3', NULL, 3, 1, 'admin', '2021-05-11 14:29:12', 'admin', '2019-04-11 14:29:31');
-INSERT INTO `sys_dict_item` VALUES ('8c618902365ca681ebbbe1e28f11a548', '4c753b5293304e7a445fd2741b46529d', '启用', '1', NULL, 0, 1, 'admin', '2020-07-18 23:19:27', 'admin', '2019-05-17 14:51:18');
-INSERT INTO `sys_dict_item` VALUES ('8cdf08045056671efd10677b8456c999', '4274efc2292239b6f000b153f50823ff', '可编辑(未授权时禁用)', '2', NULL, 2, 1, 'admin', '2019-05-10 17:55:38', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('8ff48e657a7c5090d4f2a59b37d1b878', '4d7fec1a7799a436d26d02325eff295e', '中', 'M', '中', 2, 1, 'admin', '2019-04-16 17:04:40', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('948923658baa330319e59b2213cda97c', '880a895c98afeca9d9ac39f29e67c13e', '添加', '2', NULL, 2, 1, 'admin', '2019-07-22 10:54:59', 'admin', '2019-07-22 10:55:36');
-INSERT INTO `sys_dict_item` VALUES ('9a96c4a4e4c5c9b4e4d0cbf6eb3243cc', '4c753b5293304e7a445fd2741b46529d', '不启用', '0', NULL, 1, 1, 'admin', '2019-03-18 23:19:53', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('a1e7d1ca507cff4a480c8caba7c1339e', '880a895c98afeca9d9ac39f29e67c13e', '导出', '6', NULL, 6, 1, 'admin', '2019-07-22 12:06:50', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('a2be752dd4ec980afaec1efd1fb589af', '8dfe32e2d29ea9430a988b3b558bf233', '已撤销', '2', '已撤销', 3, 1, 'admin', '2019-04-16 17:41:39', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('aa0d8a8042a18715a17f0a888d360aa4', 'ac2f7c0c5c5775fcea7e2387bcb22f01', '一级菜单', '0', NULL, NULL, 1, 'admin', '2019-03-18 23:24:52', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('adcf2a1fe93bb99a84833043f475fe0b', '4e4602b3e3686f0911384e188dc7efb4', '包含', 'IN', '包含', 8, 1, 'admin', '2019-04-01 16:45:47', 'admin', '2019-04-01 17:49:24');
-INSERT INTO `sys_dict_item` VALUES ('b029a41a851465332ee4ee69dcf0a4c2', '0b5d19e1fce4b2e6647e6b4a17760c14', '系统消息', '2', NULL, 1, 1, 'admin', '2019-02-22 18:02:08', 'admin', '2019-04-22 18:02:13');
-INSERT INTO `sys_dict_item` VALUES ('b2a8b4bb2c8e66c2c4b1bb086337f393', '3486f32803bb953e7155dab3513dc68b', '正常', '0', NULL, NULL, 1, 'admin', '2022-10-18 21:46:48', 'admin', '2019-03-28 22:22:20');
-INSERT INTO `sys_dict_item` VALUES ('b57f98b88363188daf38d42f25991956', '6b78e3f59faec1a4750acff08030a79b', '22', '222', NULL, NULL, 0, 'admin', '2019-02-21 19:59:43', 'admin', '2019-03-11 21:23:27');
-INSERT INTO `sys_dict_item` VALUES ('b5f3bd5f66bb9a83fecd89228c0d93d1', '68168534ff5065a152bfab275c2136f8', '无效', '0', '无效', 1, 1, 'admin', '2019-04-26 19:21:49', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('b9fbe2a3602d4a27b45c100ac5328484', '78bda155fe380b1b3f175f1e88c284c6', '待提交', '1', '待提交', 1, 1, 'admin', '2019-05-09 16:32:35', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('ba27737829c6e0e582e334832703d75e', '236e8a4baff0db8c62c00dd95632834f', '同步', '1', '同步', 1, 1, 'admin', '2019-05-15 15:28:15', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('bcec04526b04307e24a005d6dcd27fd6', '880a895c98afeca9d9ac39f29e67c13e', '导入', '5', NULL, 5, 1, 'admin', '2019-07-22 12:06:41', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('c53da022b9912e0aed691bbec3c78473', '880a895c98afeca9d9ac39f29e67c13e', '查询', '1', NULL, 1, 1, 'admin', '2019-07-22 10:54:51', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('c5700a71ad08994d18ad1dacc37a71a9', 'a7adbcd86c37f7dbc9b66945c82ef9e6', '否', '0', NULL, 1, 1, 'admin', '2019-05-22 19:29:55', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('cbfcc5b88fc3a90975df23ffc8cbe29c', 'c5a14c75172783d72cbee6ee7f5df5d1', '曲线图', 'line', NULL, 2, 1, 'admin', '2019-05-12 17:05:30', 'admin', '2019-04-12 17:06:06');
-INSERT INTO `sys_dict_item` VALUES ('d217592908ea3e00ff986ce97f24fb98', 'c5a14c75172783d72cbee6ee7f5df5d1', '数据列表', 'table', NULL, 4, 1, 'admin', '2019-04-12 17:05:56', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('df168368dcef46cade2aadd80100d8aa', '3d9a351be3436fbefb1307d4cfb49bf2', '男', '1', NULL, 1, 1, NULL, '2027-08-04 14:56:49', 'admin', '2019-03-23 22:44:44');
-INSERT INTO `sys_dict_item` VALUES ('e6329e3a66a003819e2eb830b0ca2ea0', '4e4602b3e3686f0911384e188dc7efb4', '小于', '<', '小于', 2, 1, 'admin', '2019-04-01 16:44:15', 'admin', '2019-04-01 17:48:34');
-INSERT INTO `sys_dict_item` VALUES ('e94eb7af89f1dbfa0d823580a7a6e66a', '236e8a4baff0db8c62c00dd95632834f', '不同步', '0', '不同步', 2, 1, 'admin', '2019-05-15 15:28:28', NULL, NULL);
-INSERT INTO `sys_dict_item` VALUES ('f0162f4cc572c9273f3e26b2b4d8c082', 'ad7c65ba97c20a6805d5dcdf13cdaf36', 'booostrap', '1', NULL, 1, 1, 'admin', '2021-08-22 16:32:04', 'admin', '2019-03-22 16:33:57');
-INSERT INTO `sys_dict_item` VALUES ('1531984025085562882', '1415574243599777794', '社会', '8', '社会', 1, 1, 'admin', '2022-06-01 21:00:29', NULL, NULL);
-INSERT into `sys_dict_item` VALUES('1420564005536411665','1420563456950808577','编辑文件',8,'编辑文件',8,1,'admin','2022-10-29 09:57:06',null,null);
+INSERT INTO `sys_dict_item` VALUES ('f16c5706f3ae05c57a53850c64ce7c45', 'a9d9942bd0eccb6e89de92d130ec4c4a', '发送成功', '1', NULL, NULL, 2, 1, 'admin', '2019-04-12 18:19:43', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('f2a7920421f3335afdf6ad2b342f6b5d', '845da5006c97754728bf48b6a10f79cc', '冻结', '2', NULL, NULL, NULL, 1, 'admin', '2019-03-18 21:46:02', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('f37f90c496ec9841c4c326b065e00bb2', '83bfb33147013cc81640d5fd9eda030c', '登录日志', '1', NULL,NULL, NULL, 1, 'admin', '2019-03-18 23:22:37', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('f753aff60ff3931c0ecb4812d8b5e643', '4c03fca6bf1f0299c381213961566349', '双排布局', 'double', NULL,NULL, 3, 1, 'admin', '2019-04-12 17:43:51', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('f80a8f6838215753b05e1a5ba3346d22', '880a895c98afeca9d9ac39f29e67c13e', '删除', '4', NULL, NULL, 4, 1, 'admin', '2019-07-22 10:55:14', 'admin', '2019-07-22 10:55:30');
+INSERT INTO `sys_dict_item` VALUES ('fcec03570f68a175e1964808dc3f1c91', '4c03fca6bf1f0299c381213961566349', 'Tab风格', 'tab', NULL, NULL, 1, 1, 'admin', '2019-04-12 17:43:31', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('fe50b23ae5e68434def76f67cef35d2d', '78bda155fe380b1b3f175f1e88c284c6', '已作废', '4', NULL, '已作废', 4, 1, 'admin', '2021-09-09 16:33:43', 'admin', '2019-05-09 16:34:40');
+INSERT INTO `sys_dict_item` VALUES ('1420564005536411661', '1420563456950808577', '修改', '6', NULL, '修改', 6, 1, 'admin', '2021-07-29 09:57:06', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1420564005536411664', '1420563456950808577', '删除', '7', NULL, '删除', 7, 1, 'admin', '2021-07-29 09:57:06', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1450412465588580354', '1450412344901677057', '本部门公开', '1', NULL, '本部门与下级部门可见', 2, 1, NULL, '2021-10-19 18:44:14', 'admin', '2022-06-01 20:54:15');
+INSERT INTO `sys_dict_item` VALUES ('1450412578524409857', '1450412344901677057', '所有部门', '0', NULL, '所有部门公开可见', 2, 1, NULL, '2021-10-19 18:44:41', 'admin', '2022-06-01 20:54:32');
+INSERT INTO `sys_dict_item` VALUES ('0072d115e07c875d76c9b022e2179128', '4d7fec1a7799a436d26d02325eff295e', '低', 'L', NULL, '低', 3, 1, 'admin', '2019-04-16 17:04:59', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('05a2e732ce7b00aa52141ecc3e330b4e', '3486f32803bb953e7155dab3513dc68b', '已删除', '1', NULL, NULL, NULL, 1, 'admin', '2025-10-18 21:46:56', 'admin', '2019-03-28 22:23:20');
+INSERT INTO `sys_dict_item` VALUES ('096c2e758d823def3855f6376bc736fb', 'bd1b8bc28e65d6feefefb6f3c79f42fd', 'SQL', 'sql', NULL, NULL, 1, 1, 'admin', '2019-04-12 17:26:26', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('0c9532916f5cd722017b46bc4d953e41', '2f0320997ade5dd147c90130f7218c3e', '指定用户', 'USER', NULL, NULL, NULL, 1, 'admin', '2019-03-17 21:22:19', 'admin', '2019-03-17 21:22:28');
+INSERT INTO `sys_dict_item` VALUES ('0ca4beba9efc4f9dd54af0911a946d5c', '72cce0989df68887546746d8f09811aa', '附表', '3', NULL, NULL, 3, 1, 'admin', '2019-03-27 10:13:43', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1030a2652608f5eac3b49d70458b8532', '2e02df51611a4b9632828ab7e5338f00', '禁用', '2', NULL, '禁用', 2, 1, 'admin', '2021-03-26 18:27:28', 'admin', '2019-04-26 18:39:11');
+INSERT INTO `sys_dict_item` VALUES ('1174509082208395266', '1174511106530525185', '岗位', '3', NULL, '岗位', 1, 1, 'admin', '2019-09-19 10:31:16', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1174509601047994369', '1174509082208395266', '员级', '1', NULL, NULL, 1, 1, 'admin', '2019-09-19 10:24:45', 'admin', '2019-09-23 11:46:39');
+INSERT INTO `sys_dict_item` VALUES ('1174509667297026049', '1174509082208395266', '助级', '2', NULL, NULL, 2, 1, 'admin', '2019-09-19 10:25:01', 'admin', '2019-09-23 11:46:47');
+INSERT INTO `sys_dict_item` VALUES ('1174509713568587777', '1174509082208395266', '中级', '3', NULL, NULL, 3, 1, 'admin', '2019-09-19 10:25:12', 'admin', '2019-09-23 11:46:56');
+INSERT INTO `sys_dict_item` VALUES ('1174509788361416705', '1174509082208395266', '副高级', '4', NULL, NULL, 4, 1, 'admin', '2019-09-19 10:25:30', 'admin', '2019-09-23 11:47:06');
+INSERT INTO `sys_dict_item` VALUES ('1174509835803189250', '1174509082208395266', '正高级', '5', NULL, NULL, 5, 1, 'admin', '2019-09-19 10:25:41', 'admin', '2019-09-23 11:47:12');
+INSERT INTO `sys_dict_item` VALUES ('1174511197735665665', '1174511106530525185', '公司', '1', NULL, '公司', 1, 1, 'admin', '2019-09-19 10:31:05', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1174511244036587521', '1174511106530525185', '部门', '2', NULL, '部门', 1, 1, 'admin', '2019-09-19 10:31:16', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1178295553450061826', '1178295274528845826', '可编辑(未授权禁用)', '2', NULL, NULL, 2, 1, 'admin', '2019-09-29 21:08:46', 'admin', '2019-09-29 21:09:18');
+INSERT INTO `sys_dict_item` VALUES ('1178295639554928641', '1178295274528845826', '可见(未授权不可见)', '1', NULL, NULL, 1, 1, 'admin', '2019-09-29 21:09:06', 'admin', '2019-09-29 21:09:24');
+INSERT INTO `sys_dict_item` VALUES ('1199517884758368257', '1199517671259906049', '一般', '1', NULL, NULL, 1, 1, 'admin', '2019-11-27 10:38:44', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199517914017832962', '1199517671259906049', '重要', '2', NULL, NULL, 1, 1, 'admin', '2019-11-27 10:38:51', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199517941339529217', '1199517671259906049', '紧急', '3', NULL, NULL, 1, 1, 'admin', '2019-11-27 10:38:58', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199518186144276482', '1199518099888414722', '日常记录', '1', NULL, NULL, 1, 1, 'admin', '2019-11-27 10:39:56', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199518214858481666', '1199518099888414722', '本周工作', '2', NULL, NULL, 1, 1, 'admin', '2019-11-27 10:40:03', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199518235943247874', '1199518099888414722', '下周计划', '3', NULL, NULL, 1, 1, 'admin', '2019-11-27 10:40:08', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199520817285701634', '1199520177767587841', '列表', '1', NULL, NULL, 1, 1, 'admin', '2019-11-27 10:50:24', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199520835035996161', '1199520177767587841', '链接', '2', NULL, NULL, 1, 1, 'admin', '2019-11-27 10:50:28', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199525468672405505', '1199525215290306561', '未开始', '0', NULL, NULL, 1, 1, 'admin', '2019-11-27 11:08:52', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199525490575060993', '1199525215290306561', '进行中', '1', NULL, NULL, 1, 1, 'admin', '2019-11-27 11:08:58', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1199525506429530114', '1199525215290306561', '已完成', '2', NULL, NULL, 1, 1, 'admin', '2019-11-27 11:09:02', 'admin', '2019-11-27 11:10:02');
+INSERT INTO `sys_dict_item` VALUES ('1199607547704647681', '4f69be5f507accea8d5df5f11346181a', '系统', '4', NULL, NULL, 1, 1, 'admin', '2019-11-27 16:35:02', 'admin', '2019-11-27 19:37:46');
+INSERT INTO `sys_dict_item` VALUES ('1209733775114702850', '1209733563293962241', 'MySQL5.5', '1', NULL, NULL, 1, 1, 'admin', '2019-12-25 15:13:02', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1209733839933476865', '1209733563293962241', 'Oracle', '2', NULL, NULL, 3, 1, 'admin', '2019-12-25 15:13:18', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1209733903020003330', '1209733563293962241', 'SQLServer', '3', NULL, NULL, 4, 1, 'admin', '2019-12-25 15:13:33', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1232913424813486081', '1232913193820581889', '官方示例', 'demo', NULL, NULL, 1, 1, 'admin', '2020-02-27 14:20:42', 'admin', '2020-02-27 14:21:37');
+INSERT INTO `sys_dict_item` VALUES ('1232913493717512194', '1232913193820581889', '流程表单', 'bpm', NULL, NULL, 2, 1, 'admin', '2020-02-27 14:20:58', 'admin', '2020-02-27 14:22:20');
+INSERT INTO `sys_dict_item` VALUES ('1232913605382467585', '1232913193820581889', '测试表单', 'temp', NULL, NULL, 4, 1, 'admin', '2020-02-27 14:21:25', 'admin', '2020-02-27 14:22:16');
+INSERT INTO `sys_dict_item` VALUES ('1232914232372195330', '1232913193820581889', '导入表单', 'bdfl_include', NULL, NULL, 5, 1, 'admin', '2020-02-27 14:23:54', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1234371726545010689', '4e4602b3e3686f0911384e188dc7efb4', '左模糊', 'LEFT_LIKE', NULL, '左模糊', 7, 1, 'admin', '2020-03-02 14:55:27', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1234371809495760898', '4e4602b3e3686f0911384e188dc7efb4', '右模糊', 'RIGHT_LIKE', NULL, '右模糊', 7, 1, 'admin', '2020-03-02 14:55:47', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1250688147579228161', '1250687930947620866', '正常', '0', NULL, NULL, 1, 1, 'admin', '2020-04-16 15:31:05', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1250688201064992770', '1250687930947620866', '停止', '-1', NULL, NULL, 1, 1, 'admin', '2020-04-16 15:31:18', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1280401815068295170', '1280401766745718786', '正常', '1', NULL, NULL, 1, 1, 'admin', '2020-07-07 15:22:36', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1280401847607705602', '1280401766745718786', '冻结', '0', NULL, NULL, 1, 1, 'admin', '2020-07-07 15:22:44', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1305827309355302914', 'bd1b8bc28e65d6feefefb6f3c79f42fd', 'API', 'api', NULL, NULL, 3, 1, 'admin', '2020-09-15 19:14:26', 'admin', '2020-09-15 19:14:41');
+INSERT INTO `sys_dict_item` VALUES ('1334440962954936321', '1209733563293962241', 'MYSQL5.7', '4', NULL, NULL, 1, 1, 'admin', '2020-12-03 18:16:02', 'admin', '2020-12-03 18:16:02');
+INSERT INTO `sys_dict_item` VALUES ('1356445705549975553', '1356445645198135298', '是', 'Y', NULL, NULL, 1, 1, 'admin', '2021-02-02 11:33:52', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1356445754212290561', '1356445645198135298', '否', 'N', NULL, NULL, 1, 1, 'admin', '2021-02-02 11:34:04', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1415510117652013057', '1415509679443714049', '干货', '1', NULL, '', 1, 1, 'admin', '2021-07-14 22:14:46', 'admin', '2022-06-01 20:55:30');
+INSERT INTO `sys_dict_item` VALUES ('1415512755764371457', '1415509679443714049', '重点', '2', NULL, '', 1, 1, 'admin', '2021-07-14 22:25:15', 'admin', '2022-06-01 20:55:37');
+INSERT INTO `sys_dict_item` VALUES ('1415512840657084418', '1415509679443714049', '最新', '3', NULL, '', 1, 1, 'admin', '2021-07-14 22:25:35', 'admin', '2022-06-01 20:55:44');
+INSERT INTO `sys_dict_item` VALUES ('1415512908009218049', '1415509679443714049', '实用', '4', NULL, '', 1, 1, 'admin', '2021-07-14 22:25:51', 'admin', '2022-06-01 20:55:54');
+INSERT INTO `sys_dict_item` VALUES ('1415512988313362433', '1415509679443714049', '名师', '5', NULL, '', 1, 1, 'admin', '2021-07-14 22:26:10', 'admin', '2022-06-01 20:56:03');
+INSERT INTO `sys_dict_item` VALUES ('1415513052456853505', '1415509679443714049', '经典', '6', NULL, '', 1, 1, 'admin', '2021-07-14 22:26:25', 'admin', '2022-06-01 20:56:31');
+INSERT INTO `sys_dict_item` VALUES ('1415513104826933249', '1415509679443714049', '理论', '7', NULL, '', 1, 1, 'admin', '2021-07-14 22:26:38', 'admin', '2022-06-01 20:56:40');
+INSERT INTO `sys_dict_item` VALUES ('1415518346117292034', '1415509679443714049', '实操', '8', NULL, '', 1, 1, 'admin', '2021-07-14 22:47:27', 'admin', '2022-06-01 20:56:50');
+INSERT INTO `sys_dict_item` VALUES ('1415518423493812226', '1415509679443714049', '潮流', '9', NULL, '', 1, 1, 'admin', '2021-07-14 22:47:46', 'admin', '2022-06-01 20:57:04');
+INSERT INTO `sys_dict_item` VALUES ('1415518535649501185', '1415509679443714049', '必考', '10', NULL, '', 1, 1, 'admin', '2021-07-14 22:48:13', 'admin', '2022-06-01 20:57:12');
+INSERT INTO `sys_dict_item` VALUES ('1415518651982716929', '1415509679443714049', '进修', '11', NULL, '', 1, 1, 'admin', '2021-07-14 22:48:40', 'admin', '2022-06-01 20:58:11');
+INSERT INTO `sys_dict_item` VALUES ('1415518739014524929', '1415509679443714049', '继续教育', '12', NULL, '', 1, 1, 'admin', '2021-07-14 22:49:01', 'admin', '2022-06-01 20:58:42');
+INSERT INTO `sys_dict_item` VALUES ('1415518946661933057', '1415509679443714049', '实践', '14', NULL, '', 1, 1, 'admin', '2021-07-14 22:49:51', 'admin', '2022-06-01 20:58:33');
+INSERT INTO `sys_dict_item` VALUES ('1415519089138245634', '1415509679443714049', '付费', '15', NULL, '', 3, 1, 'admin', '2021-07-14 22:50:25', 'admin', '2022-06-01 20:59:12');
+INSERT INTO `sys_dict_item` VALUES ('1415519478847807490', '1415509679443714049', '入门', '19', NULL, '', 11, 1, 'admin', '2021-07-14 22:51:57', 'admin', '2022-06-01 20:58:18');
+INSERT INTO `sys_dict_item` VALUES ('1415574342098812929', '1415574243599777794', '编程', '1', NULL, '', 1, 1, 'admin', '2021-07-15 02:29:58', 'admin', '2022-03-29 15:13:08');
+INSERT INTO `sys_dict_item` VALUES ('1415574391214112769', '1415574243599777794', '数据库', '2', NULL, '', 1, 1, 'admin', '2021-07-15 02:30:10', 'admin', '2022-03-29 15:13:14');
+INSERT INTO `sys_dict_item` VALUES ('1415574432960020481', '1415574243599777794', '架构', '3', NULL, '', 1, 1, 'admin', '2021-07-15 02:30:20', 'admin', '2022-03-29 15:13:20');
+INSERT INTO `sys_dict_item` VALUES ('1415574502241533954', '1415574243599777794', '前端', '4', NULL, '', 1, 1, 'admin', '2021-07-15 02:30:36', 'admin', '2022-03-29 15:13:28');
+INSERT INTO `sys_dict_item` VALUES ('1415574564849909762', '1415574243599777794', 'UI设计', '5', NULL, '', 1, 1, 'admin', '2021-07-15 02:30:51', 'admin', '2022-03-29 15:13:36');
+INSERT INTO `sys_dict_item` VALUES ('1415574697549299713', '1415574243599777794', '中间件', '7', NULL, '', 1, 1, 'admin', '2021-07-15 02:31:23', 'admin', '2022-03-29 15:14:17');
+INSERT INTO `sys_dict_item` VALUES ('1418496971277398018', '1418495479619317761', '入库失败', '-1',NULL,  NULL, 1, 1, 'admin', '2021-07-23 04:03:27', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1418497014818467842', '1418495479619317761', '等待入库', '0', NULL, NULL, 1, 1, 'admin', '2021-07-23 04:03:37', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1418497058619584514', '1418495479619317761', '已入库', '1',NULL,  NULL, 1, 1, 'admin', '2021-07-23 04:03:48', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1418497118333890561', '1418495479619317761', '不需要入库', '2', NULL, NULL, 1, 1, 'admin', '2021-07-23 04:04:02', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1420563600144347137', '1420563456950808577', '上传', '0', NULL, '上传', 0, 1, 'admin', '2021-07-29 09:55:30', 'admin', '2021-07-29 09:55:57');
+INSERT INTO `sys_dict_item` VALUES ('1420563682348511233', '1420563456950808577', '审核通过', '1', NULL, '审核通过', 1, 1, 'admin', '2021-07-29 09:55:49', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1420563785893294082', '1420563456950808577', '审核拒绝', '2',NULL,  '审核拒绝', 2, 1, 'admin', '2021-07-29 09:56:14', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1420563852746305538', '1420563456950808577', '修改预览文档', '3',NULL,  '修改预览文档', 3, 1, 'admin', '2021-07-29 09:56:30', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1420563930554839041', '1420563456950808577', '下载', '4', NULL, '下载', 4, 1, 'admin', '2021-07-29 09:56:49', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1420564005536411650', '1420563456950808577', '预览', '5', NULL, '预览', 5, 1, 'admin', '2021-07-29 09:57:06', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435461449668542466', '1435461054779015169', '草稿', '0', NULL, NULL, 1, 1, 'admin', '2021-09-08 12:34:14', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435461470677811202', '1435461054779015169', '待审核', '1', NULL, NULL, 1, 1, 'admin', '2021-09-08 12:34:19', 'admin', '2021-09-08 12:35:03');
+INSERT INTO `sys_dict_item` VALUES ('1435461526139092994', '1435461054779015169', '审核通过', '2', NULL, NULL, 1, 1, 'admin', '2021-09-08 12:34:32', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435461599442944002', '1435461054779015169', '审核驳回', '3',NULL, NULL, 1, 1, 'admin', '2021-09-08 12:34:50', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435764110502576129', '1435763999777144834', '分类', '1', NULL, NULL, 1, 1, 'admin', '2021-09-09 08:36:54', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435764144711319554', '1435763999777144834', '状态', '2', NULL, NULL, 1, 1, 'admin', '2021-09-09 08:37:02', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435764240131735554', '1435763999777144834', '标签', '4', NULL, NULL, 1, 1, 'admin', '2021-09-09 08:37:25', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1435764293730746370', '1435763999777144834', '知识专题', '5', NULL, NULL, 1, 1, 'admin', '2021-09-09 08:37:37', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1446749165269880833', '1446749054125019137', '公开', '0', NULL, NULL, 1, 1, 'admin', '2021-10-09 16:07:35', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1446749218503987201', '1446749054125019137', '不公开', '1', NULL, NULL, 1, 1, 'admin', '2021-10-09 16:07:48', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('147c48ff4b51545032a9119d13f3222a', 'd6e1152968b02d69ff358c75b48a6ee1', '测试流程', 'test', NULL, NULL, 1, 1, 'admin', '2019-03-22 19:27:05', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1543fe7e5e26fb97cdafe4981bedc0c8', '4c03fca6bf1f0299c381213961566349', '单排布局', 'single', NULL, NULL, 2, 1, 'admin', '2022-07-12 17:43:39', 'admin', '2019-04-12 17:43:57');
+INSERT INTO `sys_dict_item` VALUES ('1ce390c52453891f93514c1bd2795d44', 'ad7c65ba97c20a6805d5dcdf13cdaf36', '000', '00', NULL, NULL, 1, 1, 'admin', '2019-03-22 16:34:34', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('1db531bcff19649fa82a644c8a939dc4', '4c03fca6bf1f0299c381213961566349', '组合布局', 'combination', NULL, NULL, 4, 1, 'admin', '2019-05-11 16:07:08', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('222705e11ef0264d4214affff1fb4ff9', '4f69be5f507accea8d5df5f11346181a', '短信', '1', NULL, NULL, 1, 1, 'admin', '2023-02-28 10:50:36', 'admin', '2019-04-28 10:58:11');
+INSERT INTO `sys_dict_item` VALUES ('23a5bb76004ed0e39414e928c4cde155', '4e4602b3e3686f0911384e188dc7efb4', '不等于', '!=', NULL, '不等于', 3, 1, 'admin', '2019-04-01 16:46:15', 'admin', '2019-04-01 17:48:40');
+INSERT INTO `sys_dict_item` VALUES ('25847e9cb661a7c711f9998452dc09e6', '4e4602b3e3686f0911384e188dc7efb4', '小于等于', '<=', NULL, '小于等于', 6, 1, 'admin', '2019-04-01 16:44:34', 'admin', '2019-04-01 17:49:10');
+INSERT INTO `sys_dict_item` VALUES ('2d51376643f220afdeb6d216a8ac2c01', '68168534ff5065a152bfab275c2136f8', '有效', '1', NULL, '有效', 2, 1, 'admin', '2019-04-26 19:22:01', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('308c8aadf0c37ecdde188b97ca9833f5', '8dfe32e2d29ea9430a988b3b558bf233', '已发布', '1', NULL, '已发布', 2, 1, 'admin', '2019-04-16 17:41:24', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('333e6b2196e01ef9a5f76d74e86a6e33', '8dfe32e2d29ea9430a988b3b558bf233', '未发布', '0', NULL, '未发布', 1, 1, 'admin', '2019-04-16 17:41:12', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('337ea1e401bda7233f6258c284ce4f50', 'bd1b8bc28e65d6feefefb6f3c79f42fd', 'JSON', 'json', NULL, NULL, 1, 1, 'admin', '2019-04-12 17:26:33', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('33bc9d9f753cf7dc40e70461e50fdc54', 'a9d9942bd0eccb6e89de92d130ec4c4a', '发送失败', '2', NULL, NULL, 3, 1, 'admin', '2019-04-12 18:20:02', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('3fbc03d6c994ae06d083751248037c0e', '78bda155fe380b1b3f175f1e88c284c6', '已完成', '3', NULL, '已完成', 3, 1, 'admin', '2019-05-09 16:33:25', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('41d7aaa40c9b61756ffb1f28da5ead8e', '0b5d19e1fce4b2e6647e6b4a17760c14', '通知公告', '1', NULL, NULL, 1, 1, 'admin', '2019-04-22 18:01:57', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('41fa1e9571505d643aea87aeb83d4d76', '4e4602b3e3686f0911384e188dc7efb4', '等于', '=', NULL, '等于', 4, 1, 'admin', '2019-04-01 16:45:24', 'admin', '2019-04-01 17:49:00');
+INSERT INTO `sys_dict_item` VALUES ('43d2295b8610adce9510ff196a49c6e9', '845da5006c97754728bf48b6a10f79cc', '正常', '1', NULL, NULL, NULL, 1, 'admin', '2019-03-18 21:45:51', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('4f05fb5376f4c61502c5105f52e4dd2b', '83bfb33147013cc81640d5fd9eda030c', '操作日志', '2', NULL, NULL, NULL, 1, 'admin', '2019-03-18 23:22:49', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('50223341bfb5ba30bf6319789d8d17fe', 'd6e1152968b02d69ff358c75b48a6ee1', '业务办理', 'business', NULL, NULL, 3, 1, 'admin', '2023-04-22 19:28:05', 'admin', '2019-03-22 23:24:39');
+INSERT INTO `sys_dict_item` VALUES ('51222413e5906cdaf160bb5c86fb827c', 'a7adbcd86c37f7dbc9b66945c82ef9e6', '是', '1', NULL, NULL, 1, 1, 'admin', '2019-05-22 19:29:45', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('538fca35afe004972c5f3947c039e766', '2e02df51611a4b9632828ab7e5338f00', '显示', '1', NULL, '显示', 1, 1, 'admin', '2025-03-26 18:27:13', 'admin', '2019-04-26 18:39:07');
+INSERT INTO `sys_dict_item` VALUES ('5584c21993bde231bbde2b966f2633ac', '4e4602b3e3686f0911384e188dc7efb4', '自定义SQL表达式', 'USE_SQL_RULES', NULL, '自定义SQL表达式', 9, 1, 'admin', '2019-04-01 10:45:24', 'admin', '2019-04-01 17:49:27');
+INSERT INTO `sys_dict_item` VALUES ('58b73b344305c99b9d8db0fc056bbc0a', '72cce0989df68887546746d8f09811aa', '主表', '2', NULL, NULL, 2, 1, 'admin', '2019-03-27 10:13:36', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('5b65a88f076b32e8e69d19bbaadb52d5', '2f0320997ade5dd147c90130f7218c3e', '全体用户', 'ALL', NULL, NULL, NULL, 1, 'admin', '2020-10-17 21:22:43', 'admin', '2019-03-28 22:17:09');
+INSERT INTO `sys_dict_item` VALUES ('5d833f69296f691843ccdd0c91212b6b', '880a895c98afeca9d9ac39f29e67c13e', '修改', '3', NULL, NULL, 3, 1, 'admin', '2019-07-22 10:55:07', 'admin', '2019-07-22 10:55:41');
+INSERT INTO `sys_dict_item` VALUES ('5d84a8634c8fdfe96275385075b105c9', '3d9a351be3436fbefb1307d4cfb49bf2', '女', '2', NULL, NULL, 2, 1, NULL, '2019-01-04 14:56:56', NULL, '2019-01-04 17:38:12');
+INSERT INTO `sys_dict_item` VALUES ('66c952ae2c3701a993e7db58f3baf55e', '4e4602b3e3686f0911384e188dc7efb4', '大于', '>', NULL, '大于', 1, 1, 'admin', '2019-04-01 10:45:46', 'admin', '2019-04-01 17:48:29');
+INSERT INTO `sys_dict_item` VALUES ('6937c5dde8f92e9a00d4e2ded9198694', 'ad7c65ba97c20a6805d5dcdf13cdaf36', 'easyui', '3', NULL, NULL, 1, 1, 'admin', '2019-03-22 16:32:15', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('69cacf64e244100289ddd4aa9fa3b915', 'a9d9942bd0eccb6e89de92d130ec4c4a', '未发送', '0', NULL, NULL, 1, 1, 'admin', '2019-04-12 18:19:23', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('6a7a9e1403a7943aba69e54ebeff9762', '4f69be5f507accea8d5df5f11346181a', '邮件', '2', NULL, NULL, 2, 1, 'admin', '2031-02-28 10:50:44', 'admin', '2019-04-28 10:59:03');
+INSERT INTO `sys_dict_item` VALUES ('6c682d78ddf1715baf79a1d52d2aa8c2', '72cce0989df68887546746d8f09811aa', '单表', '1', NULL, NULL, 1, 1, 'admin', '2019-03-27 10:13:29', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('6d404fd2d82311fbc87722cd302a28bc', '4e4602b3e3686f0911384e188dc7efb4', '模糊', 'LIKE', NULL, '模糊', 7, 1, 'admin', '2019-04-01 16:46:02', 'admin', '2019-04-01 17:49:20');
+INSERT INTO `sys_dict_item` VALUES ('6d4e26e78e1a09699182e08516c49fc4', '4d7fec1a7799a436d26d02325eff295e', '高', 'H', NULL, '高', 1, 1, 'admin', '2019-04-16 17:04:24', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('700e9f030654f3f90e9ba76ab0713551', '6b78e3f59faec1a4750acff08030a79b', '333', '333', NULL, NULL, NULL, 1, 'admin', '2019-02-21 19:59:47', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('7050c1522702bac3be40e3b7d2e1dfd8', 'c5a14c75172783d72cbee6ee7f5df5d1', '柱状图', 'bar', NULL, NULL, 1, 1, 'admin', '2019-04-12 17:05:17', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('71b924faa93805c5c1579f12e001c809', 'd6e1152968b02d69ff358c75b48a6ee1', 'OA办公', 'oa', NULL, NULL, 2, 1, 'admin', '2021-03-22 19:27:17', 'admin', '2019-03-22 23:24:36');
+INSERT INTO `sys_dict_item` VALUES ('75b260d7db45a39fc7f21badeabdb0ed', 'c36169beb12de8a71c8683ee7c28a503', '不启用', '0', NULL, NULL, NULL, 1, 'admin', '2019-03-18 23:29:41', 'admin', '2019-03-18 23:29:54');
+INSERT INTO `sys_dict_item` VALUES ('7688469db4a3eba61e6e35578dc7c2e5', 'c36169beb12de8a71c8683ee7c28a503', '启用', '1', NULL, NULL, NULL, 1, 'admin', '2019-03-18 23:29:28', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('78ea6cadac457967a4b1c4eb7aaa418c', 'fc6cd58fde2e8481db10d3a1e68ce70c', '正常', '1', NULL, NULL, NULL, 1, 'admin', '2019-03-18 23:30:28', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('7ccf7b80c70ee002eceb3116854b75cb', 'ac2f7c0c5c5775fcea7e2387bcb22f01', '按钮权限', '2', NULL, NULL, NULL, 1, 'admin', '2019-03-18 23:25:40', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('81fb2bb0e838dc68b43f96cc309f8257', 'fc6cd58fde2e8481db10d3a1e68ce70c', '冻结', '2', NULL, NULL, NULL, 1, 'admin', '2019-03-18 23:30:37', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('83250269359855501ec4e9c0b7e21596', '4274efc2292239b6f000b153f50823ff', '可见/可访问(授权后可见/可访问)', '1', NULL, NULL, 1, 1, 'admin', '2019-05-10 17:54:51', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('84778d7e928bc843ad4756db1322301f', '4e4602b3e3686f0911384e188dc7efb4', '大于等于', '>=', NULL, '大于等于', 5, 1, 'admin', '2019-04-01 10:46:02', 'admin', '2019-04-01 17:49:05');
+INSERT INTO `sys_dict_item` VALUES ('848d4da35ebd93782029c57b103e5b36', 'c5a14c75172783d72cbee6ee7f5df5d1', '饼图', 'pie', NULL, NULL, 3, 1, 'admin', '2019-04-12 17:05:49', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('84dfc178dd61b95a72900fcdd624c471', '78bda155fe380b1b3f175f1e88c284c6', '处理中', '2', NULL, '处理中', 2, 1, 'admin', '2019-05-09 16:33:01', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('86f19c7e0a73a0bae451021ac05b99dd', 'ac2f7c0c5c5775fcea7e2387bcb22f01', '子菜单', '1', NULL, NULL, NULL, 1, 'admin', '2019-03-18 23:25:27', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('8bccb963e1cd9e8d42482c54cc609ca2', '4f69be5f507accea8d5df5f11346181a', '微信', '3', NULL, NULL, 3, 1, 'admin', '2021-05-11 14:29:12', 'admin', '2019-04-11 14:29:31');
+INSERT INTO `sys_dict_item` VALUES ('8c618902365ca681ebbbe1e28f11a548', '4c753b5293304e7a445fd2741b46529d', '启用', '1', NULL, NULL, 0, 1, 'admin', '2020-07-18 23:19:27', 'admin', '2019-05-17 14:51:18');
+INSERT INTO `sys_dict_item` VALUES ('8cdf08045056671efd10677b8456c999', '4274efc2292239b6f000b153f50823ff', '可编辑(未授权时禁用)', '2', NULL, NULL, 2, 1, 'admin', '2019-05-10 17:55:38', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('8ff48e657a7c5090d4f2a59b37d1b878', '4d7fec1a7799a436d26d02325eff295e', '中', 'M', NULL, '中', 2, 1, 'admin', '2019-04-16 17:04:40', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('948923658baa330319e59b2213cda97c', '880a895c98afeca9d9ac39f29e67c13e', '添加', '2', NULL, NULL, 2, 1, 'admin', '2019-07-22 10:54:59', 'admin', '2019-07-22 10:55:36');
+INSERT INTO `sys_dict_item` VALUES ('9a96c4a4e4c5c9b4e4d0cbf6eb3243cc', '4c753b5293304e7a445fd2741b46529d', '不启用', '0', NULL, NULL, 1, 1, 'admin', '2019-03-18 23:19:53', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('a1e7d1ca507cff4a480c8caba7c1339e', '880a895c98afeca9d9ac39f29e67c13e', '导出', '6',NULL,  NULL, 6, 1, 'admin', '2019-07-22 12:06:50', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('a2be752dd4ec980afaec1efd1fb589af', '8dfe32e2d29ea9430a988b3b558bf233', '已撤销', '2', NULL, '已撤销', 3, 1, 'admin', '2019-04-16 17:41:39', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('aa0d8a8042a18715a17f0a888d360aa4', 'ac2f7c0c5c5775fcea7e2387bcb22f01', '一级菜单', '0', NULL, NULL, NULL, 1, 'admin', '2019-03-18 23:24:52', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('adcf2a1fe93bb99a84833043f475fe0b', '4e4602b3e3686f0911384e188dc7efb4', '包含', 'IN', NULL, '包含', 8, 1, 'admin', '2019-04-01 16:45:47', 'admin', '2019-04-01 17:49:24');
+INSERT INTO `sys_dict_item` VALUES ('b029a41a851465332ee4ee69dcf0a4c2', '0b5d19e1fce4b2e6647e6b4a17760c14', '系统消息', '2', NULL, NULL, 1, 1, 'admin', '2019-02-22 18:02:08', 'admin', '2019-04-22 18:02:13');
+INSERT INTO `sys_dict_item` VALUES ('b2a8b4bb2c8e66c2c4b1bb086337f393', '3486f32803bb953e7155dab3513dc68b', '正常', '0', NULL, NULL, NULL, 1, 'admin', '2022-10-18 21:46:48', 'admin', '2019-03-28 22:22:20');
+INSERT INTO `sys_dict_item` VALUES ('b57f98b88363188daf38d42f25991956', '6b78e3f59faec1a4750acff08030a79b', '22', '222', NULL, NULL, NULL, 0, 'admin', '2019-02-21 19:59:43', 'admin', '2019-03-11 21:23:27');
+INSERT INTO `sys_dict_item` VALUES ('b5f3bd5f66bb9a83fecd89228c0d93d1', '68168534ff5065a152bfab275c2136f8', '无效', '0', NULL, '无效', 1, 1, 'admin', '2019-04-26 19:21:49', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('b9fbe2a3602d4a27b45c100ac5328484', '78bda155fe380b1b3f175f1e88c284c6', '待提交', '1', NULL, '待提交', 1, 1, 'admin', '2019-05-09 16:32:35', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('ba27737829c6e0e582e334832703d75e', '236e8a4baff0db8c62c00dd95632834f', '同步', '1', NULL, '同步', 1, 1, 'admin', '2019-05-15 15:28:15', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('bcec04526b04307e24a005d6dcd27fd6', '880a895c98afeca9d9ac39f29e67c13e', '导入', '5', NULL, NULL, 5, 1, 'admin', '2019-07-22 12:06:41', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('c53da022b9912e0aed691bbec3c78473', '880a895c98afeca9d9ac39f29e67c13e', '查询', '1', NULL, NULL, 1, 1, 'admin', '2019-07-22 10:54:51', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('c5700a71ad08994d18ad1dacc37a71a9', 'a7adbcd86c37f7dbc9b66945c82ef9e6', '否', '0', NULL, NULL, 1, 1, 'admin', '2019-05-22 19:29:55', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('cbfcc5b88fc3a90975df23ffc8cbe29c', 'c5a14c75172783d72cbee6ee7f5df5d1', '曲线图', 'line', NULL, NULL, 2, 1, 'admin', '2019-05-12 17:05:30', 'admin', '2019-04-12 17:06:06');
+INSERT INTO `sys_dict_item` VALUES ('d217592908ea3e00ff986ce97f24fb98', 'c5a14c75172783d72cbee6ee7f5df5d1', '数据列表', 'table', NULL, NULL, 4, 1, 'admin', '2019-04-12 17:05:56', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('df168368dcef46cade2aadd80100d8aa', '3d9a351be3436fbefb1307d4cfb49bf2', '男', '1', NULL, NULL, 1, 1, NULL, '2027-08-04 14:56:49', 'admin', '2019-03-23 22:44:44');
+INSERT INTO `sys_dict_item` VALUES ('e6329e3a66a003819e2eb830b0ca2ea0', '4e4602b3e3686f0911384e188dc7efb4', '小于', '<', NULL, '小于', 2, 1, 'admin', '2019-04-01 16:44:15', 'admin', '2019-04-01 17:48:34');
+INSERT INTO `sys_dict_item` VALUES ('e94eb7af89f1dbfa0d823580a7a6e66a', '236e8a4baff0db8c62c00dd95632834f', '不同步', '0', NULL, '不同步', 2, 1, 'admin', '2019-05-15 15:28:28', NULL, NULL);
+INSERT INTO `sys_dict_item` VALUES ('f0162f4cc572c9273f3e26b2b4d8c082', 'ad7c65ba97c20a6805d5dcdf13cdaf36', 'booostrap', '1', NULL, NULL, 1, 1, 'admin', '2021-08-22 16:32:04', 'admin', '2019-03-22 16:33:57');
+INSERT INTO `sys_dict_item` VALUES ('1531984025085562882', '1415574243599777794', '社会', '8', NULL, '社会', 1, 1, 'admin', '2022-06-01 21:00:29', NULL, NULL);
+INSERT into `sys_dict_item` VALUES('1420564005536411665','1420563456950808577','编辑文件',8,NULL, '编辑文件',8,1,'admin','2022-10-29 09:57:06',null,null);
 -- ----------------------------
 -- Table structure for sys_fill_rule
 -- ----------------------------
@@ -1081,6 +1113,8 @@ CREATE TABLE `sys_log`  (
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+  `tenant_id` int(10) NULL DEFAULT NULL COMMENT '租户ID',
+  `client_type` varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '客户端类型 pc:电脑端 app:手机端 h5:移动网页端',
   INDEX `idx_sl_create_time`(`create_time`) USING BTREE,
   INDEX `idx_sl_log_type`(`log_type`) USING BTREE,
   INDEX `idx_sl_operate_type`(`operate_type`) USING BTREE,
@@ -1113,6 +1147,7 @@ CREATE TABLE `sys_permission`  (
   `is_leaf` decimal(4, 0) NULL DEFAULT NULL COMMENT '是否叶子节点:    1:是   0:不是',
   `keep_alive` decimal(4, 0) NULL DEFAULT NULL COMMENT '是否缓存该页面:    1:是   0:不是',
   `hidden` decimal(11, 0) NULL DEFAULT NULL COMMENT '是否隐藏路由: 0否,1是',
+  `hide_tab` tinyint(4) NULL DEFAULT NULL COMMENT '是否隐藏tab: 0否,1是',
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
   `create_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
@@ -1127,44 +1162,44 @@ CREATE TABLE `sys_permission`  (
 -- ----------------------------
 -- Records of sys_permission
 -- ----------------------------
-INSERT INTO `sys_permission` VALUES ('9502685863ab87f0ad1134142788a385', NULL, '首页', '/dashboard/analysis', 'dashboard/Analysis', NULL, NULL, 0, NULL, NULL, 0.00, 0, 'home', 1, 1, NULL, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-03-29 11:04:13', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('97c8629abc7848eccdb6d77c24bb3ebb', '700b7f95165c46cc7a78bf227aa8fed3', '磁盘监控', '/monitor/Disk', 'modules/monitor/DiskMonitoring', NULL, NULL, 1, NULL, NULL, 6.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-25 14:30:06', 'admin', '2019-05-05 14:37:14', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('9cb91b8851db0cf7b19d7ecc2a8193dd', '1939e035e803a99ceecb6f5563570fb2', '我的任务表单', '/modules/bpm/task/form/FormModule', 'modules/bpm/task/form/FormModule', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-03-08 16:49:05', 'admin', '2019-03-08 18:37:56', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('b1cb0a3fedf7ed0e4653cb5a229837ee', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '定时任务', '/isystem/QuartzJobList', 'system/QuartzJobList', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2019-01-03 09:38:52', 'admin', '2020-09-09 14:48:16', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('b6bcee2ccc854052d3cc3e9c96d90197', '71102b3b87fb07e5527bbd2c530dd90a', '加班申请', '/modules/extbpm/joa/JoaOvertimeList', 'modules/extbpm/joa/JoaOvertimeList', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-03 15:33:10', 'admin', '2019-04-03 15:34:48', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('d07a2c87a451434c99ab06296727ec4f', '700b7f95165c46cc7a78bf227aa8fed3', 'JVM信息', '/monitor/JvmInfo', 'modules/monitor/JvmInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-01 23:07:48', 'admin', '2019-04-02 11:37:16', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('d7d6e2e4e2934f2c9385a623fd98c6f3', NULL, '系统管理', '/isystem', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 7.00, 0, 'setting', 1, 0, 0, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2021-07-14 01:50:27', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('e41b69c57a941a3bbcce45032fe57605', '', '在线开发', '/online', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 6.00, 0, 'cloud', 1, 0, 0, 1, NULL, 'admin', '2019-03-08 10:43:10', 'admin', '2022-06-01 20:07:25', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('024f1fd1283dc632458976463d8984e1', '700b7f95165c46cc7a78bf227aa8fed3', 'Tomcat信息', '/monitor/TomcatInfo', 'modules/monitor/TomcatInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 09:44:29', 'admin', '2019-05-07 15:19:10', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('08e6b9dc3c04489c8e1ff2ce6f105aa4', NULL, '系统监控', '/dashboard3', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 6.00, 0, 'dashboard', 1, 0, 0, 1, NULL, NULL, '2018-12-25 20:34:38', 'ceshi', '2021-10-14 15:05:03', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('109c78a583d4693ce2f16551b7786786', 'e41b69c57a941a3bbcce45032fe57605', 'Online报表配置', '/online/cgreport', 'modules/online/cgreport/OnlCgreportHeadList', NULL, NULL, 1, NULL, NULL, 2.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-03-08 10:51:07', 'ceshi', '2021-12-15 22:21:31', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('1415139394194399233', NULL, '文件管理', '/km/filemanagement', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 1.00, 0, 'folder', 1, 0, 0, 0, NULL, 'admin', '2021-07-13 21:41:38', 'admin', '2021-07-14 01:40:06', 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1415145872468893697', '1415139394194399233', '草稿文件上传', '/km/filemanagement/draftslist', 'km/filemanagement/DraftsList', NULL, NULL, 1, NULL, '1', 1.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-13 22:07:23', 'admin', '2022-03-16 20:18:22', 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1415156984451063809', NULL, '配置管理', '/km/datasetting', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 2.00, 0, 'cluster', 1, 0, 0, 0, NULL, 'admin', '2021-07-13 22:51:32', 'admin', '2021-07-29 17:28:49', 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1415201088958537730', '1415139394194399233', '待审核文件', '/km/filemanagement/pendingreviewlist', 'km/filemanagement/PendingReviewList', NULL, NULL, 1, NULL, '1', 2.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-14 01:46:47', 'ceshi', '2021-10-14 15:17:42', 0, 1, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1415206488843919361', '1415139394194399233', '已审核文件', '/km/filemanagement/auditedlist', 'km/filemanagement/AuditedList', NULL, NULL, 1, NULL, '1', 3.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-14 02:08:15', 'admin', '2021-10-09 20:20:35', 0, 1, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1415216128377921537', '1415156984451063809', '知识专题定义', '/km/datasetting/projectdefinitionlist', 'km/datasetting/ProjectDefinitionList', NULL, NULL, 1, NULL, '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-14 02:46:33', NULL, NULL, 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1415277817119023106', '1415156984451063809', '文档属性定义', '/km/datasetting/dictlist', 'km/datasetting/DictList', NULL, NULL, 1, NULL, '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-14 06:51:41', 'admin', '2021-07-29 17:28:22', 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1419574496959193090', '1415156984451063809', '系统参数', '/km/datasetting/KmSysConfigList', 'km/datasetting/KmSysConfigList', NULL, NULL, 1, NULL, '1', 3.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-07-26 03:25:09', NULL, NULL, 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1420569168296886273', '1420569665158332418', '文档操作记录', '/online/cgreport/1420565897964433409', 'modules/online/cgreport/auto/OnlCgreportAutoList', NULL, NULL, 1, NULL, '1', 1.00, 0, NULL, 0, 1, 0, 0, NULL, 'admin', '2021-07-29 10:17:37', 'ceshi', '2021-10-14 23:30:58', 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1420569665158332418', NULL, '日志', '/layouts/RouteView', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 1.80, 0, 'diff', 1, 0, 0, 0, NULL, 'admin', '2021-07-29 10:19:36', 'admin', '2021-08-04 17:04:21', 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1422846497589129218', '1415139394194399233', '文件统计', '/km/filemanagement/FileStatisticsList', 'km/filemanagement/FileStatisticsList', NULL, NULL, 1, NULL, '1', 4.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2021-08-04 17:06:55', 'ceshi', '2021-10-14 18:01:35', 0, 0, '1', 0);
-INSERT INTO `sys_permission` VALUES ('190c2b43bec6a5f7a4194a85db67d96a', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '角色管理', '/isystem/roleUserList', 'system/RoleUserList', NULL, NULL, 1, NULL, NULL, 1.20, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-04-17 15:13:56', 'admin', '2019-12-25 09:36:31', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('3f915b2769fc80648e92d04e84ca059d', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '用户管理', '/isystem/user', 'system/UserList', NULL, NULL, 1, NULL, NULL, 1.10, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-12-25 09:36:24', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('45c966826eeff4c99b8f8ebfe74511fc', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '部门管理', '/isystem/depart', 'system/DepartList', NULL, NULL, 1, NULL, NULL, 1.40, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-01-29 18:47:40', 'admin', '2019-12-25 09:36:47', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('54dd5457a3190740005c1bfec55b1c34', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '菜单管理', '/isystem/permission', 'system/PermissionList', NULL, NULL, 1, NULL, NULL, 1.30, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-12-25 09:36:39', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('58857ff846e61794c69208e9d3a85466', '1420569665158332418', '系统日志', '/isystem/log', 'system/LogList', NULL, NULL, 1, NULL, NULL, 2.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2018-12-26 10:11:18', 'admin', '2021-07-29 10:20:23', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('700b7f95165c46cc7a78bf227aa8fed3', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '性能监控', '/monitor', 'layouts/RouteView', NULL, NULL, 1, NULL, NULL, 3.00, 0, NULL, 1, 0, 0, 0, NULL, 'admin', '2019-04-02 11:34:34', 'admin', '2020-09-09 14:48:51', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('841057b8a1bef8f6b4b20f9a618a7fa6', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '数据日志', '/sys/dataLog-list', 'system/DataLogList', NULL, NULL, 1, NULL, NULL, 2.10, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2019-03-11 19:26:49', 'admin', '2020-09-09 14:48:32', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('8b3bff2eee6f1939147f5c68292a1642', '700b7f95165c46cc7a78bf227aa8fed3', '服务器信息', '/monitor/SystemInfo', 'modules/monitor/SystemInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 11:39:19', 'admin', '2019-04-02 15:40:02', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('8d1ebd663688965f1fd86a2f0ead3416', '700b7f95165c46cc7a78bf227aa8fed3', 'Redis监控', '/monitor/redis/info', 'modules/monitor/RedisInfo', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 13:11:33', 'admin', '2019-05-07 15:18:54', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('9fe26464838de2ea5e90f2367e35efa0', 'e41b69c57a941a3bbcce45032fe57605', 'AUTO在线报表', '/online/cgreport/:code', 'modules/online/cgreport/auto/OnlCgreportAutoList', 'onlineAutoList', NULL, 1, NULL, NULL, 9.00, 0, NULL, 1, 1, 0, 1, NULL, 'admin', '2019-03-12 11:06:48', 'ceshi', '2021-12-15 22:21:35', 0, 0, NULL, 0);
-INSERT INTO `sys_permission` VALUES ('1453933027082489858', '1415139394194399233', '收藏夹', '/km/filemanagement/KmDocFavouriteList', 'km/filemanagement/KmDocFavouriteList', NULL, NULL, 1, NULL, '1', 0.00, 0, NULL, 1, 1, 0, 0, NULL, 'ceshi', '2021-10-29 11:53:41', NULL, NULL, 0, NULL, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1456909004028821505', '1415139394194399233', '检索列表', '/km/search/DoSearch', 'km/search/DoSearch', NULL, NULL, 1, NULL, '1', 9.00, 0, NULL, 1, 0, 0, 1, NULL, 'ceshi', '2021-11-06 16:59:09', NULL, NULL, 0, NULL, '1', 0);
-INSERT INTO `sys_permission` VALUES ('1456909292378832898', '1456909004028821505', '批量下载', '/km/search/DoSearch', NULL, NULL, NULL, 2, 'searchList:batchDownload', '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, 'ceshi', '2021-11-06 17:00:18', NULL, NULL, 0, NULL, '1', 0);
-INSERT INTO `sys_permission` VALUES ('fc810a2267dd183e4ef7c71cc60f4670', '700b7f95165c46cc7a78bf227aa8fed3', '请求追踪', '/monitor/HttpTrace', 'modules/monitor/HttpTrace', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, 'admin', '2019-04-02 09:46:19', 'admin', '2019-04-02 11:37:27', 0, 0, NULL, NULL);
-INSERT INTO `sys_permission` VALUES ('1531912068221132802', '1415139394194399233', '全局检索权限', NULL, NULL, NULL, NULL, 2, 'DepartmentFilterIgnore', '1', 1.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2022-06-01 16:14:33', NULL, NULL, 0, NULL, '1', 0);
-INSERT INTO `sys_permission` VALUES ('141957449695919345', '1415156984451063809', '数据库备份', '/km/datasetting/KmSysDbBackupList', 'km/datasetting/KmSysDbBackupList', NULL, NULL, 1, NULL, '1', 4.00, 0, NULL, 1, 1, 0, 0, NULL, 'admin', '2023-05-11 03:25:09', NULL, NULL, 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('9502685863ab87f0ad1134142788a385', NULL, '首页', '/dashboard/analysis', 'dashboard/Analysis', NULL, NULL, 0, NULL, NULL, 0.00, 0, 'home', 1, 1, NULL, 0, NULL, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-03-29 11:04:13', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('97c8629abc7848eccdb6d77c24bb3ebb', '700b7f95165c46cc7a78bf227aa8fed3', '磁盘监控', '/monitor/Disk', 'modules/monitor/DiskMonitoring', NULL, NULL, 1, NULL, NULL, 6.00, 0, NULL, 1, 1, NULL, 0, NULL, NULL, 'admin', '2019-04-25 14:30:06', 'admin', '2019-05-05 14:37:14', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('9cb91b8851db0cf7b19d7ecc2a8193dd', '1939e035e803a99ceecb6f5563570fb2', '我的任务表单', '/modules/bpm/task/form/FormModule', 'modules/bpm/task/form/FormModule', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, NULL, 'admin', '2019-03-08 16:49:05', 'admin', '2019-03-08 18:37:56', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('b1cb0a3fedf7ed0e4653cb5a229837ee', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '定时任务', '/isystem/QuartzJobList', 'system/QuartzJobList', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, NULL, '2019-01-03 09:38:52', 'admin', '2020-09-09 14:48:16', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('b6bcee2ccc854052d3cc3e9c96d90197', '71102b3b87fb07e5527bbd2c530dd90a', '加班申请', '/modules/extbpm/joa/JoaOvertimeList', 'modules/extbpm/joa/JoaOvertimeList', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, NULL, 'admin', '2019-04-03 15:33:10', 'admin', '2019-04-03 15:34:48', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('d07a2c87a451434c99ab06296727ec4f', '700b7f95165c46cc7a78bf227aa8fed3', 'JVM信息', '/monitor/JvmInfo', 'modules/monitor/JvmInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, NULL, 'admin', '2019-04-01 23:07:48', 'admin', '2019-04-02 11:37:16', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('d7d6e2e4e2934f2c9385a623fd98c6f3', NULL, '系统管理', '/isystem', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 7.00, 0, 'setting', 1, 0, 0, 0, NULL, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2021-07-14 01:50:27', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('e41b69c57a941a3bbcce45032fe57605', '', '在线开发', '/online', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 6.00, 0, 'cloud', 1, 0, 0, 1, NULL, NULL, 'admin', '2019-03-08 10:43:10', 'admin', '2022-06-01 20:07:25', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('024f1fd1283dc632458976463d8984e1', '700b7f95165c46cc7a78bf227aa8fed3', 'Tomcat信息', '/monitor/TomcatInfo', 'modules/monitor/TomcatInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, NULL, 'admin', '2019-04-02 09:44:29', 'admin', '2019-05-07 15:19:10', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('08e6b9dc3c04489c8e1ff2ce6f105aa4', NULL, '系统监控', '/dashboard3', 'layouts/RouteView', NULL, NULL, 0, NULL, NULL, 6.00, 0, 'dashboard', 1, 0, 0, 1, NULL, NULL, NULL, '2018-12-25 20:34:38', 'ceshi', '2021-10-14 15:05:03', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('109c78a583d4693ce2f16551b7786786', 'e41b69c57a941a3bbcce45032fe57605', 'Online报表配置', '/online/cgreport', 'modules/online/cgreport/OnlCgreportHeadList', NULL, NULL, 1, NULL, NULL, 2.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2019-03-08 10:51:07', 'ceshi', '2021-12-15 22:21:31', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('1415139394194399233', NULL, '文件管理', '/km/filemanagement', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 1.00, 0, 'folder', 1, 0, 0, 0, NULL, NULL, 'admin', '2021-07-13 21:41:38', 'admin', '2021-07-14 01:40:06', 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415145872468893697', '1415139394194399233', '草稿文件上传', '/km/filemanagement/draftslist', 'km/filemanagement/DraftsList', NULL, NULL, 1, NULL, '1', 1.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2021-07-13 22:07:23', 'admin', '2022-03-16 20:18:22', 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415156984451063809', NULL, '配置管理', '/km/datasetting', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 2.00, 0, 'cluster', 1, 0, 0, 0, NULL, NULL, 'admin', '2021-07-13 22:51:32', 'admin', '2021-07-29 17:28:49', 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415201088958537730', '1415139394194399233', '待审核文件', '/km/filemanagement/pendingreviewlist', 'km/filemanagement/PendingReviewList', NULL, NULL, 1, NULL, '1', 2.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2021-07-14 01:46:47', 'ceshi', '2021-10-14 15:17:42', 0, 1, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415206488843919361', '1415139394194399233', '已审核文件', '/km/filemanagement/auditedlist', 'km/filemanagement/AuditedList', NULL, NULL, 1, NULL, '1', 3.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2021-07-14 02:08:15', 'admin', '2021-10-09 20:20:35', 0, 1, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415216128377921537', '1415156984451063809', '知识专题定义', '/km/datasetting/projectdefinitionlist', 'km/datasetting/ProjectDefinitionList', NULL, NULL, 1, NULL, '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2021-07-14 02:46:33', NULL, NULL, 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1415277817119023106', '1415156984451063809', '文档属性定义', '/km/datasetting/dictlist', 'km/datasetting/DictList', NULL, NULL, 1, NULL, '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2021-07-14 06:51:41', 'admin', '2021-07-29 17:28:22', 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1419574496959193090', '1415156984451063809', '系统参数', '/km/datasetting/KmSysConfigList', 'km/datasetting/KmSysConfigList', NULL, NULL, 1, NULL, '1', 3.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2021-07-26 03:25:09', NULL, NULL, 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1420569168296886273', '1420569665158332418', '文档操作记录', '/online/cgreport/1420565897964433409', 'modules/online/cgreport/auto/OnlCgreportAutoList', NULL, NULL, 1, NULL, '1', 1.00, 0, NULL, 0, 1, 0, 0, NULL, NULL, 'admin', '2021-07-29 10:17:37', 'ceshi', '2021-10-14 23:30:58', 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1420569665158332418', NULL, '日志', '/layouts/RouteView', 'layouts/RouteView', NULL, NULL, 0, NULL, '1', 1.80, 0, 'diff', 1, 0, 0, 0, NULL, NULL, 'admin', '2021-07-29 10:19:36', 'admin', '2021-08-04 17:04:21', 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1422846497589129218', '1415139394194399233', '文件统计', '/km/filemanagement/FileStatisticsList', 'km/filemanagement/FileStatisticsList', NULL, NULL, 1, NULL, '1', 4.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2021-08-04 17:06:55', 'ceshi', '2021-10-14 18:01:35', 0, 0, '1', 0);
+INSERT INTO `sys_permission` VALUES ('190c2b43bec6a5f7a4194a85db67d96a', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '角色管理', '/isystem/roleUserList', 'system/RoleUserList', NULL, NULL, 1, NULL, NULL, 1.20, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2019-04-17 15:13:56', 'admin', '2019-12-25 09:36:31', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('3f915b2769fc80648e92d04e84ca059d', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '用户管理', '/isystem/user', 'system/UserList', NULL, NULL, 1, NULL, NULL, 1.10, 0, NULL, 1, 1, 0, 0, NULL, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-12-25 09:36:24', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('45c966826eeff4c99b8f8ebfe74511fc', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '部门管理', '/isystem/depart', 'system/DepartList', NULL, NULL, 1, NULL, NULL, 1.40, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2019-01-29 18:47:40', 'admin', '2019-12-25 09:36:47', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('54dd5457a3190740005c1bfec55b1c34', 'd7d6e2e4e2934f2c9385a623fd98c6f3', '菜单管理', '/isystem/permission', 'system/PermissionList', NULL, NULL, 1, NULL, NULL, 1.30, 0, NULL, 1, 1, 0, 0, NULL, NULL, NULL, '2018-12-25 20:34:38', 'admin', '2019-12-25 09:36:39', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('58857ff846e61794c69208e9d3a85466', '1420569665158332418', '系统日志', '/isystem/log', 'system/LogList', NULL, NULL, 1, NULL, NULL, 2.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, NULL, '2018-12-26 10:11:18', 'admin', '2021-07-29 10:20:23', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('700b7f95165c46cc7a78bf227aa8fed3', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '性能监控', '/monitor', 'layouts/RouteView', NULL, NULL, 1, NULL, NULL, 3.00, 0, NULL, 1, 0, 0, 0, NULL, NULL, 'admin', '2019-04-02 11:34:34', 'admin', '2020-09-09 14:48:51', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('841057b8a1bef8f6b4b20f9a618a7fa6', '08e6b9dc3c04489c8e1ff2ce6f105aa4', '数据日志', '/sys/dataLog-list', 'system/DataLogList', NULL, NULL, 1, NULL, NULL, 2.10, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2019-03-11 19:26:49', 'admin', '2020-09-09 14:48:32', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('8b3bff2eee6f1939147f5c68292a1642', '700b7f95165c46cc7a78bf227aa8fed3', '服务器信息', '/monitor/SystemInfo', 'modules/monitor/SystemInfo', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, NULL, 'admin', '2019-04-02 11:39:19', 'admin', '2019-04-02 15:40:02', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('8d1ebd663688965f1fd86a2f0ead3416', '700b7f95165c46cc7a78bf227aa8fed3', 'Redis监控', '/monitor/redis/info', 'modules/monitor/RedisInfo', NULL, NULL, 1, NULL, NULL, 1.00, 0, NULL, 1, 1, NULL, 0, NULL, NULL, 'admin', '2019-04-02 13:11:33', 'admin', '2019-05-07 15:18:54', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('9fe26464838de2ea5e90f2367e35efa0', 'e41b69c57a941a3bbcce45032fe57605', 'AUTO在线报表', '/online/cgreport/:code', 'modules/online/cgreport/auto/OnlCgreportAutoList', 'onlineAutoList', NULL, 1, NULL, NULL, 9.00, 0, NULL, 1, 1, 0, 1, NULL, NULL, 'admin', '2019-03-12 11:06:48', 'ceshi', '2021-12-15 22:21:35', 0, 0, NULL, 0);
+INSERT INTO `sys_permission` VALUES ('1453933027082489858', '1415139394194399233', '收藏夹', '/km/filemanagement/KmDocFavouriteList', 'km/filemanagement/KmDocFavouriteList', NULL, NULL, 1, NULL, '1', 0.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'ceshi', '2021-10-29 11:53:41', NULL, NULL, 0, NULL, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1456909004028821505', '1415139394194399233', '检索列表', '/km/search/DoSearch', 'km/search/DoSearch', NULL, NULL, 1, NULL, '1', 9.00, 0, NULL, 1, 0, 0, 1, NULL, NULL, 'ceshi', '2021-11-06 16:59:09', NULL, NULL, 0, NULL, '1', 0);
+INSERT INTO `sys_permission` VALUES ('1456909292378832898', '1456909004028821505', '批量下载', '/km/search/DoSearch', NULL, NULL, NULL, 2, 'searchList:batchDownload', '1', NULL, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'ceshi', '2021-11-06 17:00:18', NULL, NULL, 0, NULL, '1', 0);
+INSERT INTO `sys_permission` VALUES ('fc810a2267dd183e4ef7c71cc60f4670', '700b7f95165c46cc7a78bf227aa8fed3', '请求追踪', '/monitor/HttpTrace', 'modules/monitor/HttpTrace', NULL, NULL, 1, NULL, NULL, 4.00, 0, NULL, 1, 1, NULL, 0, NULL, NULL, 'admin', '2019-04-02 09:46:19', 'admin', '2019-04-02 11:37:27', 0, 0, NULL, NULL);
+INSERT INTO `sys_permission` VALUES ('1531912068221132802', '1415139394194399233', '全局检索权限', NULL, NULL, NULL, NULL, 2, 'DepartmentFilterIgnore', '1', 1.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2022-06-01 16:14:33', NULL, NULL, 0, NULL, '1', 0);
+INSERT INTO `sys_permission` VALUES ('141957449695919345', '1415156984451063809', '数据库备份', '/km/datasetting/KmSysDbBackupList', 'km/datasetting/KmSysDbBackupList', NULL, NULL, 1, NULL, '1', 4.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, 'admin', '2023-05-11 03:25:09', NULL, NULL, 0, 0, '1', 0);
 
 -- ----------------------------
 -- Table structure for sys_permission_data_rule
@@ -1226,14 +1261,16 @@ CREATE TABLE `sys_position`  (
   `update_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '修改人',
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
   `sys_org_code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '组织机构编码',
+  `tenant_id` int(10) NULL DEFAULT 0 COMMENT '租户ID',
+  PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uniq_position_code`(`code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_position
 -- ----------------------------
-INSERT INTO `sys_position` VALUES ('1185040064792571906', 'devleader', '研发部经理', '2', NULL, 'admin', '2019-10-18 11:49:03', 'admin', '2020-02-23 22:55:42', 'A01');
-INSERT INTO `sys_position` VALUES ('1256485574212153345', '总经理', 'laozong', '5', NULL, 'admin', '2020-05-02 15:28:00', 'admin', '2020-05-02 15:28:03', '北京国炬公司');
+INSERT INTO `sys_position` VALUES ('1185040064792571906', 'devleader', '研发部经理', '2', NULL, 'admin', '2019-10-18 11:49:03', 'admin', '2020-02-23 22:55:42', 'A01',0);
+INSERT INTO `sys_position` VALUES ('1256485574212153345', '总经理', 'laozong', '5', NULL, 'admin', '2020-05-02 15:28:00', 'admin', '2020-05-02 15:28:03', '北京公司',0);
 
 -- ----------------------------
 -- Table structure for sys_quartz_job
@@ -1442,6 +1479,8 @@ CREATE TABLE `sys_user`  (
   `depart_ids` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '负责部门',
   `rel_tenant_ids` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '多租户标识',
   `client_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '设备ID',
+  `login_tenant_id` int(11) NULL DEFAULT NULL COMMENT '上次登录选择租户ID',
+  `bpm_status` varchar(2) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '流程入职离职状态',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uniq_sys_user_work_no`(`work_no`) USING BTREE,
   UNIQUE INDEX `uniq_sys_user_username`(`username`) USING BTREE,
@@ -1455,9 +1494,9 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES ('e9ca23d68d884d4ebb19d07889727dae', 'admin', '管理员', 'cb362cfeefbf3d8d', 'RCGTeGiH', '', '2018-12-05 00:00:00', 1, 'jeecg@163.com', '18611111111', 'A01', 1, 0, NULL, NULL, 1, '00001', '总经理', NULL, NULL, '2019-06-21 17:54:10', 'admin', '2022-03-27 01:50:19', 2, 'f79b7d5a99b1442c876858a6961cb1fb', NULL, NULL);
-INSERT INTO `sys_user` VALUES ('1448560127207559169', 'ceshi', '测试', '8480d522fcf8d62c', 'bslhULTz', NULL, NULL, NULL, NULL, NULL, 'A01', 1, 0, 'bf4ff455bd3344e784cf2ba92ffee2e1', '1', NULL, NULL, NULL, NULL, NULL, '2021-10-14 16:03:41', 'ceshi', '2022-03-22 14:12:52', NULL, NULL, NULL, NULL);
-INSERT INTO `sys_user` VALUES ('1509138755255885826', 'yzg', 'yzg', 'd5f077bb9c4a517e', 'Ga12Hwr9', NULL, NULL, NULL, NULL, NULL, 'A01', 1, 0, NULL, NULL, 1, NULL, NULL, NULL, 'admin', '2022-03-30 20:01:32', 'admin', '2022-06-01 21:25:23', 1, '', NULL, NULL);
+INSERT INTO `sys_user` VALUES ('e9ca23d68d884d4ebb19d07889727dae', 'admin', '管理员', 'cb362cfeefbf3d8d', 'RCGTeGiH', '', '2018-12-05 00:00:00', 1, 'jeecg@163.com', '18611111111', 'A01', 1, 0, NULL, NULL, 1, '00001', '总经理', NULL, NULL, '2019-06-21 17:54:10', 'admin', '2022-03-27 01:50:19', 2, 'f79b7d5a99b1442c876858a6961cb1fb', NULL, NULL,NULL,NULL);
+INSERT INTO `sys_user` VALUES ('1448560127207559169', 'ceshi', '测试', '8480d522fcf8d62c', 'bslhULTz', NULL, NULL, NULL, NULL, NULL, 'A01', 1, 0, 'bf4ff455bd3344e784cf2ba92ffee2e1', '1', NULL, NULL, NULL, NULL, NULL, '2021-10-14 16:03:41', 'ceshi', '2022-03-22 14:12:52', NULL, NULL, NULL, NULL,NULL,NULL);
+INSERT INTO `sys_user` VALUES ('1509138755255885826', 'yzg', 'yzg', 'd5f077bb9c4a517e', 'Ga12Hwr9', NULL, NULL, NULL, NULL, NULL, 'A01', 1, 0, NULL, NULL, 1, NULL, NULL, NULL, 'admin', '2022-03-30 20:01:32', 'admin', '2022-06-01 21:25:23', 1, '', NULL, NULL,NULL,NULL);
 
 -- ----------------------------
 -- Table structure for sys_user_agent
@@ -1508,17 +1547,22 @@ DROP TABLE IF EXISTS `sys_user_role`;
 CREATE TABLE `sys_user_role`  (
   `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '主键id',
   `user_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户id',
-  `role_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '角色id'
+  `role_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '角色id',
+  `tenant_id` int(10) NULL DEFAULT 0 COMMENT '租户ID',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sur_user_id`(`user_id`) USING BTREE,
+  INDEX `idx_sur_role_id`(`role_id`) USING BTREE,
+  INDEX `idx_sur_user_role_id`(`user_id`, `role_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户角色表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_user_role
 -- ----------------------------
-INSERT INTO `sys_user_role` VALUES ('1446823599141052418', 'f6817f48af4fb3af11b9e8bf182f618b', 'f6817f48af4fb3af11b9e8bf182f618b');
-INSERT INTO `sys_user_role` VALUES ('1506108597502578689', '1448560127207559169', '1501891096828817410');
-INSERT INTO `sys_user_role` VALUES ('1507776977431289857', 'e9ca23d68d884d4ebb19d07889727dae', 'f6817f48af4fb3af11b9e8bf182f618b');
-INSERT INTO `sys_user_role` VALUES ('1531990290465574913', '1509138755255885826', '1501891096828817410');
-INSERT INTO `sys_user_role` VALUES ('1531990290486546434', '1509138755255885826', '1531990117173710849');
+INSERT INTO `sys_user_role` VALUES ('1446823599141052418', 'f6817f48af4fb3af11b9e8bf182f618b', 'f6817f48af4fb3af11b9e8bf182f618b',0);
+INSERT INTO `sys_user_role` VALUES ('1506108597502578689', '1448560127207559169', '1501891096828817410',0);
+INSERT INTO `sys_user_role` VALUES ('1507776977431289857', 'e9ca23d68d884d4ebb19d07889727dae', 'f6817f48af4fb3af11b9e8bf182f618b',0);
+INSERT INTO `sys_user_role` VALUES ('1531990290465574913', '1509138755255885826', '1501891096828817410',0);
+INSERT INTO `sys_user_role` VALUES ('1531990290486546434', '1509138755255885826', '1531990117173710849',0);
 
 DROP TABLE IF EXISTS `km_doc_comments`;
 CREATE TABLE `km_doc_comments` (
@@ -1542,5 +1586,167 @@ CREATE TABLE `km_doc_version` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
+-- ----------------------------
+-- Table structure for sys_user_tenant
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user_tenant`;
+CREATE TABLE `sys_user_tenant`  (
+  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键id',
+  `user_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户id',
+  `tenant_id` int(10) NULL DEFAULT NULL COMMENT '租户id',
+  `status` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '状态(1 正常 2 离职 3 待审核 4 拒绝 5 邀请加入)',
+  `create_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人登录名称',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建日期',
+  `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人登录名称',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新日期',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sut_user_id`(`user_id`) USING BTREE,
+  INDEX `idx_sut_tenant_id`(`tenant_id`) USING BTREE,
+  INDEX `idx_sut_user_rel_tenant`(`user_id`, `tenant_id`) USING BTREE,
+  INDEX `idx_sut_status`(`status`) USING BTREE,
+  INDEX `idx_sut_userid_status`(`user_id`, `status`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户租户关系表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of sys_user_tenant
+-- ----------------------------
+INSERT INTO `sys_user_tenant` VALUES ('1714517525209489409', 'a75d45a015c44384a04449ee80dc3503', 1001, '1', 'ceshi', '2023-10-18 13:43:27', NULL, NULL);
+INSERT INTO `sys_user_tenant` VALUES ('1721013397267116034', 'e9ca23d68d884d4ebb19d07889727dae', 1000, '1', 'admin', '2023-11-05 11:55:43', NULL, NULL);
+INSERT INTO `sys_user_tenant` VALUES ('1803245920461766657', '1803245920382074882', 1001, '2', 'jeecg', '2024-06-19 09:58:25', 'jeecg', '2024-06-19 09:58:34');
+
+
+
+-- ----------------------------
+-- Table structure for sys_tenant
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_tenant`;
+CREATE TABLE `sys_tenant`  (
+  `id` int(10) NOT NULL COMMENT '租户编码',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '租户名称',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+  `create_by` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `begin_date` datetime NULL DEFAULT NULL COMMENT '开始时间',
+  `end_date` datetime NULL DEFAULT NULL COMMENT '结束时间',
+  `status` int(1) NULL DEFAULT NULL COMMENT '状态 1正常 0冻结',
+  `trade` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '所属行业',
+  `company_size` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '公司规模',
+  `company_address` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '公司地址',
+  `company_logo` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '公司logo',
+  `house_number` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '门牌号',
+  `work_place` varchar(100) CHARACTER SET utf32 COLLATE utf32_general_ci NULL DEFAULT NULL COMMENT '工作地点',
+  `secondary_domain` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '二级域名',
+  `login_bkgd_img` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '登录背景图片',
+  `position` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '职级',
+  `department` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '部门',
+  `del_flag` tinyint(1) NULL DEFAULT 0 COMMENT '删除状态(0-正常,1-已删除)',
+  `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `apply_status` int(3) NULL DEFAULT NULL COMMENT '允许申请管理员 1允许 0不允许',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '多租户信息表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of sys_tenant
+-- ----------------------------
+INSERT INTO `sys_tenant` VALUES (1000, '北京国炬信息技术有限公司', '2023-03-09 19:55:11', 'jeecg', NULL, NULL, 1, NULL, NULL, NULL, '', '2PI3U6', NULL, NULL, NULL, NULL, NULL, 0, 'admin', '2023-11-05 10:35:15', NULL);
+INSERT INTO `sys_tenant` VALUES (1001, '北京敲敲云科技有限公司', '2023-10-18 13:37:19', 'ceshi', NULL, NULL, 1, NULL, NULL, NULL, '', 'EX33W8', NULL, NULL, NULL, NULL, NULL, 0, 'admin', '2024-03-18 11:19:28', NULL);
+
+-- ----------------------------
+-- Table structure for sys_tenant_pack
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_tenant_pack`;
+CREATE TABLE `sys_tenant_pack`  (
+  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键id',
+  `tenant_id` int(10) NULL DEFAULT NULL COMMENT '租户id',
+  `pack_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '产品包名',
+  `status` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '开启状态(0 未开启 1开启)',
+  `remarks` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `create_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_time` date NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_time` date NULL DEFAULT NULL COMMENT '更新时间',
+  `pack_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '编码,默认添加的三个管理员需要设置编码',
+  `pack_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'custom' COMMENT '产品包类型(default 默认产品包 custom 自定义产品包)',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户产品包' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of sys_tenant_pack
+-- ----------------------------
+INSERT INTO `sys_tenant_pack` VALUES ('1714517098074152962', 0, '默认套餐', '1', NULL, 'ceshi', '2023-10-18', 'admin', '2023-12-28', NULL, 'default');
+
+-- ----------------------------
+-- Table structure for sys_tenant_pack_perms
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_tenant_pack_perms`;
+CREATE TABLE `sys_tenant_pack_perms`  (
+  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键编号',
+  `pack_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '租户产品包名称',
+  `permission_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '菜单id',
+  `create_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_time` date NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_time` date NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_stpp_pack_id`(`pack_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户产品包和菜单关系表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of sys_tenant_pack_perms
+-- ----------------------------
+INSERT INTO `sys_tenant_pack_perms` VALUES ('1714517098137067522', '1714517098074152962', '1473927410093187073', 'ceshi', '2023-10-18', NULL, NULL);
+INSERT INTO `sys_tenant_pack_perms` VALUES ('1714517098199982082', '1714517098074152962', '1473955758466981890', 'ceshi', '2023-10-18', NULL, NULL);
+INSERT INTO `sys_tenant_pack_perms` VALUES ('1714517098199982083', '1714517098074152962', '1542385335362383873', 'ceshi', '2023-10-18', NULL, NULL);
+INSERT INTO `sys_tenant_pack_perms` VALUES ('1714517098199982084', '1714517098074152962', '1554384900763729922', 'ceshi', '2023-10-18', NULL, NULL);
+
+-- ----------------------------
+-- Table structure for sys_tenant_pack_user
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_tenant_pack_user`;
+CREATE TABLE `sys_tenant_pack_user`  (
+  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `pack_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '租户产品包ID',
+  `user_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户ID',
+  `tenant_id` int(10) NULL DEFAULT NULL COMMENT '租户ID',
+  `create_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `status` int(3) NULL DEFAULT NULL COMMENT '状态 正常状态1 申请状态0',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_tpu_pack_id`(`pack_id`) USING BTREE,
+  INDEX `idx_tpu_user_id`(`user_id`) USING BTREE,
+  INDEX `idx_tpu_tenant_id`(`tenant_id`) USING BTREE,
+  INDEX `idx_tpu_status`(`status`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户套餐人员表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of sys_tenant_pack_user
+-- ----------------------------
+INSERT INTO `sys_tenant_pack_user` VALUES ('1633795234318729217', '1633795213938606082', 'a75d45a015c44384a04449ee80dc3503', 1, 'admin', '2023-03-09 19:41:53', NULL, NULL, 1);
+
+-- ----------------------------
+-- Table structure for sys_user_position
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user_position`;
+CREATE TABLE `sys_user_position`  (
+  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键',
+  `user_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户id',
+  `position_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '职位id',
+  `create_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '修改人',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sup_user_id`(`user_id`) USING BTREE,
+  INDEX `idx_sup_position_id`(`position_id`) USING BTREE,
+  INDEX `idx_sup_user_position_id`(`user_id`, `position_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of sys_user_position
+-- ----------------------------
+INSERT INTO `sys_user_position` VALUES ('1803742512784596994', '1714471285016895490', '1185040064792571906', 'jeecg', '2024-06-20 18:51:42', NULL, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;

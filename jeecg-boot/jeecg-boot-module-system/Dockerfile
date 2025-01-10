@@ -40,16 +40,18 @@ RUN apt-get update
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; \
 apt install -y libreoffice; \
+apt install libfreetype6; \
+apt install -y fontconfig fonts-dejavu; \
 mkdir /kykms; 
 
 WORKDIR /kykms
 
-COPY --from=build /app/km/jeecg-boot/jeecg-boot-module-system/target/jeecg-boot-module-system-2.4.5.jar ./
+COPY --from=build /app/km/jeecg-boot/jeecg-module-system/jeecg-system-start/target/jeecg-system-start-3.7.1.jar ./
 ADD ./simsun.ttc /usr/share/fonts
 
 
 
 CMD sleep 5;\
-java -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -jar jeecg-boot-module-system-2.4.5.jar
+java -Djava.security.egd=file:/dev/./urandom -jar jeecg-system-start-3.7.1.jar
 
 EXPOSE 8080
