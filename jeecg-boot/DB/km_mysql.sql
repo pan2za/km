@@ -682,6 +682,7 @@ CREATE TABLE `sys_depart`  (
   `status` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '状态（1启用，0不启用）',
   `del_flag` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '删除状态（0，正常，1已删除）',
   `qywx_identifier` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '对接企业微信的ID',
+  `ding_identifier` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '对接钉钉部门的ID',
   `create_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
   `update_by` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
@@ -697,20 +698,20 @@ CREATE TABLE `sys_depart`  (
 -- ----------------------------
 -- Records of sys_depart
 -- ----------------------------
-INSERT INTO `sys_depart` VALUES ('f79b7d5a99b1442c876858a6961cb1fb', NULL, '总裁办公室', NULL, NULL, 0, NULL, '1', '1', 'A01', NULL, NULL, NULL, 'root', NULL, '0', NULL, 'ceshi', '2021-10-14 16:41:10', 'admin', '2022-06-01 21:23:52',0,1);
-INSERT INTO `sys_depart` VALUES ('10c6c58575c24db297d838ec5c5f813d', NULL, '秘书部', NULL, NULL, 0, NULL, '1', '1', 'A04', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:29:03', 'admin', '2022-06-01 21:22:04',0,1);
-INSERT INTO `sys_depart` VALUES ('a06041ec62674810983326ae552ced92', NULL, '研发部', NULL, NULL, 0, NULL, '1', '1', 'A05', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-21 16:30:10', 'admin', '2022-06-01 21:22:11',0,1);
-INSERT INTO `sys_depart` VALUES ('e615307e7b684f15885ef6da29f6771d', 'a06041ec62674810983326ae552ced92', '开发部门', NULL, NULL, 1, NULL, '2', '2', 'A05A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:55:59', 'admin', '2022-06-01 21:22:24',0,1);
-INSERT INTO `sys_depart` VALUES ('e0c42ad532b24b5fb76e44e9ecc03389', 'e615307e7b684f15885ef6da29f6771d', '前端开发', NULL, NULL, 1, NULL, '2', '3', 'A05A01A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:15', 'admin', '2022-06-01 21:23:24',0,1);
-INSERT INTO `sys_depart` VALUES ('2d9f7327dc2e4cf2b62d058a2c422534', 'e615307e7b684f15885ef6da29f6771d', '后端开发', NULL, NULL, 2, NULL, '2', '3', 'A05A01A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:28', 'admin', '2022-06-01 21:23:32',0,1);
-INSERT INTO `sys_depart` VALUES ('7aeb44fb58da45b484ab63b338acf738', 'e615307e7b684f15885ef6da29f6771d', '测试部门', NULL, NULL, 3, NULL, '2', '3', 'A05A01A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:58:42', 'admin', '2022-06-01 21:23:42',0,1);
-INSERT INTO `sys_depart` VALUES ('5eebbb70b6e24289933613b83c19c92b', 'a06041ec62674810983326ae552ced92', '运维部', NULL, NULL, 2, NULL, '2', '2', 'A05A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:20', 'admin', '2022-06-01 21:22:31',0,1);
-INSERT INTO `sys_depart` VALUES ('2b098c54e19943fb8246e1c1162a63a2', '5eebbb70b6e24289933613b83c19c92b', '系统运维', NULL, NULL, 1, NULL, '2', '3', 'A05A02A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:59:21', 'admin', '2022-06-01 21:23:15',0,1);
-INSERT INTO `sys_depart` VALUES ('8ef9c3c7e11e4fe0b2d457803b85cd24', 'a06041ec62674810983326ae552ced92', '市场部', NULL, NULL, 3, NULL, '2', '2', 'A05A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 10:56:29', 'admin', '2022-06-01 21:22:40',0,1);
-INSERT INTO `sys_depart` VALUES ('d28c13eaaa1d4655ac4a1cd248d10158', '8ef9c3c7e11e4fe0b2d457803b85cd24', '商务部', NULL, NULL, 1, NULL, '2', '3', 'A05A03A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:00:47', 'admin', '2022-06-01 21:22:59',0,1);
-INSERT INTO `sys_depart` VALUES ('02e9449426374c099d59d31ba9142520', '8ef9c3c7e11e4fe0b2d457803b85cd24', '销售部', NULL, NULL, 2, NULL, '2', '3', 'A05A03A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:11', 'admin', '2022-06-01 21:22:50',0,1);
-INSERT INTO `sys_depart` VALUES ('3995768f0b814cb6ba09a12f833c70f5', '8ef9c3c7e11e4fe0b2d457803b85cd24', '预报运维室', NULL, NULL, 3, NULL, '2', '3', 'A05A03A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'ceshi', '2021-10-28 11:01:29', NULL, NULL,0,1);
-INSERT INTO `sys_depart` VALUES ('1fbd9362d9cd4f3b9781794ca1f509b8', '', '财务部', NULL, NULL, 0, NULL, '1', '1', 'A06', NULL, NULL, NULL, NULL, NULL, '0', NULL, 'admin', '2022-01-06 15:00:32', 'admin', '2022-06-01 21:23:59',0,1);
+INSERT INTO `sys_depart` VALUES ('f79b7d5a99b1442c876858a6961cb1fb', NULL, '总裁办公室', NULL, NULL, 0, NULL, '1', '1', 'A01', NULL, NULL, NULL, 'root', NULL, '0', NULL, NULL, 'ceshi', '2021-10-14 16:41:10', 'admin', '2022-06-01 21:23:52',0,1);
+INSERT INTO `sys_depart` VALUES ('10c6c58575c24db297d838ec5c5f813d', NULL, '秘书部', NULL, NULL, 0, NULL, '1', '1', 'A04', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL,'ceshi', '2021-10-21 16:29:03', 'admin', '2022-06-01 21:22:04',0,1);
+INSERT INTO `sys_depart` VALUES ('a06041ec62674810983326ae552ced92', NULL, '研发部', NULL, NULL, 0, NULL, '1', '1', 'A05', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-21 16:30:10', 'admin', '2022-06-01 21:22:11',0,1);
+INSERT INTO `sys_depart` VALUES ('e615307e7b684f15885ef6da29f6771d', 'a06041ec62674810983326ae552ced92', '开发部门', NULL, NULL, 1, NULL, '2', '2', 'A05A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 10:55:59', 'admin', '2022-06-01 21:22:24',0,1);
+INSERT INTO `sys_depart` VALUES ('e0c42ad532b24b5fb76e44e9ecc03389', 'e615307e7b684f15885ef6da29f6771d', '前端开发', NULL, NULL, 1, NULL, '2', '3', 'A05A01A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 10:58:15', 'admin', '2022-06-01 21:23:24',0,1);
+INSERT INTO `sys_depart` VALUES ('2d9f7327dc2e4cf2b62d058a2c422534', 'e615307e7b684f15885ef6da29f6771d', '后端开发', NULL, NULL, 2, NULL, '2', '3', 'A05A01A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 10:58:28', 'admin', '2022-06-01 21:23:32',0,1);
+INSERT INTO `sys_depart` VALUES ('7aeb44fb58da45b484ab63b338acf738', 'e615307e7b684f15885ef6da29f6771d', '测试部门', NULL, NULL, 3, NULL, '2', '3', 'A05A01A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 10:58:42', 'admin', '2022-06-01 21:23:42',0,1);
+INSERT INTO `sys_depart` VALUES ('5eebbb70b6e24289933613b83c19c92b', 'a06041ec62674810983326ae552ced92', '运维部', NULL, NULL, 2, NULL, '2', '2', 'A05A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 10:56:20', 'admin', '2022-06-01 21:22:31',0,1);
+INSERT INTO `sys_depart` VALUES ('2b098c54e19943fb8246e1c1162a63a2', '5eebbb70b6e24289933613b83c19c92b', '系统运维', NULL, NULL, 1, NULL, '2', '3', 'A05A02A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 10:59:21', 'admin', '2022-06-01 21:23:15',0,1);
+INSERT INTO `sys_depart` VALUES ('8ef9c3c7e11e4fe0b2d457803b85cd24', 'a06041ec62674810983326ae552ced92', '市场部', NULL, NULL, 3, NULL, '2', '2', 'A05A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 10:56:29', 'admin', '2022-06-01 21:22:40',0,1);
+INSERT INTO `sys_depart` VALUES ('d28c13eaaa1d4655ac4a1cd248d10158', '8ef9c3c7e11e4fe0b2d457803b85cd24', '商务部', NULL, NULL, 1, NULL, '2', '3', 'A05A03A01', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 11:00:47', 'admin', '2022-06-01 21:22:59',0,1);
+INSERT INTO `sys_depart` VALUES ('02e9449426374c099d59d31ba9142520', '8ef9c3c7e11e4fe0b2d457803b85cd24', '销售部', NULL, NULL, 2, NULL, '2', '3', 'A05A03A02', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 11:01:11', 'admin', '2022-06-01 21:22:50',0,1);
+INSERT INTO `sys_depart` VALUES ('3995768f0b814cb6ba09a12f833c70f5', '8ef9c3c7e11e4fe0b2d457803b85cd24', '预报运维室', NULL, NULL, 3, NULL, '2', '3', 'A05A03A03', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'ceshi', '2021-10-28 11:01:29', NULL, NULL,0,1);
+INSERT INTO `sys_depart` VALUES ('1fbd9362d9cd4f3b9781794ca1f509b8', '', '财务部', NULL, NULL, 0, NULL, '1', '1', 'A06', NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, 'admin', '2022-01-06 15:00:32', 'admin', '2022-06-01 21:23:59',0,1);
 
 -- ----------------------------
 -- Table structure for sys_depart_permission
@@ -1748,5 +1749,47 @@ CREATE TABLE `sys_user_position`  (
 -- Records of sys_user_position
 -- ----------------------------
 INSERT INTO `sys_user_position` VALUES ('1803742512784596994', '1714471285016895490', '1185040064792571906', 'jeecg', '2024-06-20 18:51:42', NULL, NULL);
+
+
+-- ----------------------------
+-- Table structure for sys_table_white_list
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_table_white_list`;
+CREATE TABLE `sys_table_white_list`  (
+  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键id',
+  `table_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '允许的表名',
+  `field_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '允许的字段名，多个用逗号分割',
+  `status` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '1' COMMENT '状态，1=启用，0=禁用',
+  `create_by` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uniq_sys_table_white_list_table_name`(`table_name`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统表白名单' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of sys_table_white_list
+-- ----------------------------
+INSERT INTO `sys_table_white_list` VALUES ('1701578033271521282', 'sys_user', 'phone,work_no,id,email,realname,username', '1', 'admin', '2023-09-12 10:46:32', 'admin', '2023-12-31 16:55:30');
+INSERT INTO `sys_table_white_list` VALUES ('1701581935488385025', 'oa_officialdoc_organcode', 'id,organ_name', '1', 'admin', '2023-09-12 11:02:02', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1701581977733414913', 'demo', 'id,name', '1', 'admin', '2023-09-12 11:02:12', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1701582035472203777', 'sys_permission', 'id,name', '1', 'admin', '2023-09-12 11:02:26', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1701582087619985409', 'onl_drag_comp', 'id,comp_name', '1', 'admin', '2023-09-12 11:02:38', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1701582136420712450', 'sys_depart', 'id,org_code,depart_name', '1', 'admin', '2023-09-12 11:02:50', 'admin', '2023-10-18 09:36:40');
+INSERT INTO `sys_table_white_list` VALUES ('1701582163599802370', 'design_form', 'id,desform_name,desform_code', '1', 'admin', '2023-09-12 11:02:56', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1701582190187495426', 'onl_cgform_head', 'table_txt,table_name', '1', 'admin', '2023-09-12 11:03:03', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1701582254301626370', 'oa_wps_file', 'id,name', '1', 'admin', '2023-09-12 11:03:18', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1714453996678926338', 'onl_cgreport_head', 'code', '1', 'admin', '2023-10-18 09:31:00', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1714455418728337410', 'sys_category', 'id,name', '1', 'admin', '2023-10-18 09:36:40', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1714471625900564482', 'sys_position', 'name,id', '1', 'ceshi', '2023-10-18 10:41:04', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1769610154632491009', 'sys_dict', 'dict_code', '1', 'admin', '2024-03-18 14:21:53', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1778692300030484482', 'test_shoptype_tree', 'type_name,id', '1', 'admin', '2024-04-12 15:51:05', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1782650226206269441', 'sys_tenant', 'name,id', '1', 'admin', '2024-04-23 13:58:29', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1800712552062898178', 'tj_user_report', 'name,username', '1', 'admin', '2024-06-12 10:11:43', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1801076145102925826', 'sys_data_source', 'code,name', '1', 'admin', '2024-06-13 10:16:30', NULL, NULL);
+INSERT INTO `sys_table_white_list` VALUES ('1801097090085564420', 'sys_role', 'role_name,role_code', '1', 'jeecg', '2024-06-13 11:39:44', 'admin', '2024-09-10 11:47:35');
+INSERT INTO `sys_table_white_list` VALUES ('1805416360756006913', 'wu_liao', 'wul_name,id', '1', 'admin', '2024-06-25 09:42:58', NULL, NULL);
+
 
 SET FOREIGN_KEY_CHECKS = 1;

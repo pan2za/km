@@ -17,6 +17,7 @@ VOLUME /tmp
 ENV LANG en_US.UTF-8
 RUN echo "server {  \
                       listen       80; \
+		      client_max_body_size 2000M; \
                       location ^~ /ky { \
                       proxy_pass              http://kykms:8080/ky/; \
                       proxy_set_header        Host localhost; \
