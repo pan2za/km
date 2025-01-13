@@ -17,9 +17,9 @@ RUN apt-get update
 
 RUN apt install -y git
 
-RUN git clone https://gitee.com/colornix/km.git 
+RUN git clone https://github.com/pan2za/km3.git 
 
-WORKDIR /app/km/jeecg-boot
+WORKDIR /app/km3/jeecg-boot
 
 RUN mvn clean package -DskipTests
 
