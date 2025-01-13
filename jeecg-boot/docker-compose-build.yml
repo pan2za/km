@@ -22,7 +22,7 @@ services:
       - opensearch-net
 
   kykms-redis:
-    image: docker.1ms.run/redis:latest
+    image: docker.1ms.run/redis/redis-stack:latest
     ports:
       - 6379:6379
     restart: always
@@ -128,17 +128,6 @@ services:
     ports:
       - 30018:8080
 
-    networks:
-      - opensearch-net
-
-  pgvector:  # 服务名称
-    image: docker.1ms.run/pgvector/pgvector:pg16  # 使用的镜像
-    container_name: pgvector  # 容器名称
-    environment:
-      - POSTGRES_PASSWORD=postgres  # 设置环境变量
-    ports:
-      - "5432:5432"  # 映射端口
-    restart: always  # 容器重启策略
     networks:
       - opensearch-net
 
