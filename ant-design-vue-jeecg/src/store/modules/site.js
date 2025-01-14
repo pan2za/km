@@ -8,9 +8,9 @@ import { getFileAccessHttpUrl } from '@api/manage'
 const site = {
   state: {
     siteInfo: {
-      siteTitle: '科亿知识库',
-      siteHomePageUrl: 'http://www.kykms.cn',
-      siteCopyRight: '科亿信息技术',
+      siteTitle: '椰子树知识库',
+      siteHomePageUrl: 'http://www.coconet.cn',
+      siteCopyRight: 'coconet',
       siteAvatar: siteLogo,
       siteTitleBanner: siteBannerLogo
     },

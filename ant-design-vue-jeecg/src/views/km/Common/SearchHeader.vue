@@ -2,9 +2,6 @@
   <div :class="theme">
     <router-link :to="{path:indexUrl}">
       <span>
-        <span style="float: left;margin: -5px 10px 0 15px">
-          <img style="height: 35px;" :src="siteInfo.siteAvatar" alt="logo">
-        </span>
         <span class="site-title site-title-txt show-txt url-txt">{{ siteInfo.siteTitle }}</span>
       </span>
     </router-link>

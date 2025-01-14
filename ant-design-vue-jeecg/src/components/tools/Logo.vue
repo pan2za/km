@@ -1,7 +1,6 @@
 <template>
   <div class="logo">
     <a @click="jumIndex">
-      <img :src = siteInfo.siteAvatar  alt="logo">
       <span v-if="showTitle" class="showTitle">{{ siteInfo.siteTitle  }}</span>
     </a>
   </div>
@@ -17,7 +16,7 @@
     props: {
       title: {
         type: String,
-        default: "科亿知识库",
+        default: "coconet knowledgebase",
         required: false
       },
       showTitle: {

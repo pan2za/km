@@ -19,7 +19,7 @@
       <div class="copyright">
         Copyright
         <a-icon type="copyright"/>
-        2019 <span>{{ siteInfo.siteCopyRight }}</span>
+        2025 <span>{{ siteInfo.siteCopyRight }}</span>
       </div>
       </div>
 

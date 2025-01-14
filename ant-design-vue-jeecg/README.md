@@ -1,3 +1,9 @@
+coconet knowledgebase 
+====
+release : 20250114
+change backend to km3 which is based on jeecg-boot springboot3 branch + springboot-3.4.1 + spring-ai 1.0.0-SNAPSHOT(20250114)
+
+
 科亿知识库 KY KMS
 ====
 
