@@ -22,7 +22,7 @@ services:
       - opensearch-net
 
   kykms-redis:
-    image: docker.1ms.run/redis:latest
+    image: docker.1ms.run/redis/redis-stack:latest
     ports:
       - 6379:6379
     restart: always
@@ -130,6 +130,30 @@ services:
     networks:
       - opensearch-net
 
+  ollama:
+    image: docker.1ms.run/ollama/ollama:latest
+    ports:
+      - 11434:11434 
+    volumes:
+      - ./ollama:/root/.ollama
+    networks:
+      - opensearch-net
+  
+  setup:
+    image: docker.1ms.run/curlimages/curl:latest
+    networks:
+      - opensearch-net
+    volumes:
+      - ./scripts:/ragapp
+    environment:
+      - MODEL=${MODEL:-qwen2:latest}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+    command: >
+      /bin/sh -c 
+      "/ragapp/setup_ollama.sh"
+    depends_on:
+      - ollama
+        
 volumes:
   opensearch-data1:
   opensearch-data2:
