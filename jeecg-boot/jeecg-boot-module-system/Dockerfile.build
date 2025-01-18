@@ -37,5 +37,13 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; \
 apt install -y libreoffice libfreetype6; \
 apt install -y fontconfig fonts-dejavu;
 
+ADD ./simsun.ttc /usr/share/fonts
+
+
+#CMD sleep 5;\
+#java -Djava.security.egd=file:/dev/./urandom -jar jeecg-system-start-3.7.1.jar
+
+#EXPOSE 8080
+
 # 将容器保持运行状态的简单命令
 CMD ["sh", "-c", "while true; do sleep 3600; done"]
