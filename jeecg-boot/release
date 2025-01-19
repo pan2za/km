@@ -1,0 +1,26 @@
+20250119
+
+ the kykms support ollama+embed model + redis = rag
+it support opensearch + spring-ai + jeecg springboot3
+
+1 copy the release tar back to /mnt/sdb1/release/
+
+from
+D:\版本\kykms
+
+
+2 use restore.sh to revert back kykms.tar kykms-ui.tar
+
+3 run
+
+docker-compose up
+
+to restore all other 7 images
+
+4 checking kykms-mysql's kykms_mysql.sql
+
+if it does not work, 
+
+re source kykms_mysql.sql to mysql
+
+
