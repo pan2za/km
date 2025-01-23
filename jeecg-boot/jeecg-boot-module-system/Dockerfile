@@ -11,6 +11,16 @@ ADD ./settings.xml /root/.m2/settings.xml
 
 ADD ./sources.list /etc/apt/sources.list
 
+ADD ./entrypoint.sh /usr/local/bin/entrypoint.sh
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# 创建目录并添加字体文件
+RUN mkdir /kykms && \
+    mkdir -p /usr/share/fonts
+
+ADD ./simsun.ttc /usr/share/fonts
+
 # 使用清华源替换默认源
 
 RUN apt-get update && \
@@ -26,24 +36,16 @@ RUN git clone https://gitee.com/shang_jun_shu/spring-ai.git && \
 # 克隆并构建 km3 项目
 RUN git clone https://github.com/pan2za/km3.git && \
     cd km3/jeecg-boot && \
-    mvn clean package -DskipTests
+    mvn clean package -DskipTests && \
+    cp /app/km3/jeecg-boot/jeecg-module-system/jeecg-system-start/target/jeecg-system-start-3.7.1.jar /kykms/
 
 # 第二阶段：运行阶段
 
-
-# 创建目录并添加字体文件
-RUN mkdir /kykms && \
-    mkdir -p /usr/share/fonts
-
-ADD ./simsun.ttc /usr/share/fonts
-
-# 从构建阶段复制构建好的 JAR 文件
-CMD cp /app/km3/jeecg-boot/jeecg-module-system/jeecg-system-start/target/jeecg-system-start-3.7.1.jar /kykms/
-
 WORKDIR /kykms
 
+# 将容器保持运行状态的简单命令
 # 暴露端口
 EXPOSE 8080
 
 # 启动应用
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "jeecg-system-start-3.7.1.jar"]
+ENTRYPOINT ["entrypoint.sh"]
