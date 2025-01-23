@@ -1,61 +1,49 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-    <!-- 本地仓库的位置 -->
-    <localRepository>${user.home}/.m2/repository</localRepository>
-  
-    <!-- Apache Maven 配置 -->
-    <pluginGroups/>
-    <proxies/>
-    
-    <!-- 镜像配置 -->
-    <mirrors>
-        <!-- 阿里云镜像 -->
-        <mirror>
-            <id>alimaven</id>
-            <name>aliyun maven</name>
-            <url>https://maven.aliyun.com/repository/public/</url>
-            <mirrorOf>central</mirrorOf>
-        </mirror>
-        <!-- Maven 中央仓库镜像 -->
-        <mirror>
-            <id>central-mirror</id>
-            <name>Maven Central Mirror</name>
-            <url>https://repo.maven.apache.org/maven2</url>
-            <mirrorOf>external:*</mirrorOf>
-        </mirror>
-    </mirrors>
+  <!-- 激活 profiles -->
+  <activeProfiles>
+    <activeProfile>aliyun-central-fallback</activeProfile>
+  </activeProfiles>
 
-    <profiles>
-        <!-- 阿里云配置: 提高国内的 jar 包下载速度 -->
-        <profile>
-            <id>ali</id>
-            <repositories>
-                <repository>
-                    <id>alimaven</id>
-                    <name>aliyun maven</name>
-                    <url>https://maven.aliyun.com/repository/public/</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>alimaven</id>
-                    <name>aliyun maven</name>
-                    <url>https://maven.aliyun.com/repository/public/</url>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
-    </profiles>
-    
-    <!-- 激活配置 --> 
-    <activeProfiles>
-        <activeProfile>ali</activeProfile>
-    </activeProfiles>
+  <!-- 配置镜像 -->
+  <mirrors>
+    <mirror>
+      <id>alimaven</id>
+      <name>Aliyun Maven</name>
+      <url>https://maven.aliyun.com/repository/public/</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
+
+  <!-- 定义 profiles -->
+  <profiles>
+    <profile>
+      <id>aliyun-central-fallback</id>
+      <repositories>
+        <!-- 阿里云仓库作为主要仓库 -->
+        <repository>
+          <id>aliyun</id>
+          <name>Aliyun Repository</name>
+          <url>https://maven.aliyun.com/repository/public/</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+        <!-- Maven 中央仓库作为备用仓库 -->
+        <repository>
+          <id>central</id>
+          <name>Maven Central Repository</name>
+          <url>https://repo.maven.apache.org/maven2</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+
+  <!-- 其他配置，如服务器认证信息、插件组等 -->
+
 </settings>
+
+

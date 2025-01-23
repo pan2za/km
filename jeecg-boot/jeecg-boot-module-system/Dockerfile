@@ -1,22 +1,21 @@
 # 第一阶段：构建阶段
-FROM docker.1ms.run/maven:3.8.7-openjdk-18-slim AS build
+FROM docker.1ms.run/maven:3.8.7-openjdk-18-slim
+
+# 设置时区
+ENV TZ=Asia/Shanghai
 
 WORKDIR /app
 
 # 添加 Maven 配置文件
 ADD ./settings.xml /root/.m2/settings.xml
 
+ADD ./sources.list /etc/apt/sources.list
+
 # 使用清华源替换默认源
-RUN echo \
-    "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free\n" \
-    "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free\n" \
-    "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free\n" \
-    "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free\n" \
-    > /etc/apt/sources.list && \
-    apt-get update && \
+
+RUN apt-get update && \
     apt-get install -y git && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y libreoffice libfreetype6 fontconfig fonts-dejavu 
 
 # 克隆并构建 spring-ai 项目
 RUN git clone https://gitee.com/shang_jun_shu/spring-ai.git && \
@@ -30,22 +29,7 @@ RUN git clone https://github.com/pan2za/km3.git && \
     mvn clean package -DskipTests
 
 # 第二阶段：运行阶段
-FROM docker.1ms.run/maven:3.8.7-openjdk-18-slim
 
-# 设置时区
-ENV TZ=Asia/Shanghai
-
-# 安装必要的软件包
-RUN echo \
-    "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free\n" \
-    "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free\n" \
-    "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free\n" \
-    "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free\n" \
-    > /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y libreoffice libfreetype6 fontconfig fonts-dejavu && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # 创建目录并添加字体文件
 RUN mkdir /kykms && \
@@ -54,7 +38,7 @@ RUN mkdir /kykms && \
 ADD ./simsun.ttc /usr/share/fonts
 
 # 从构建阶段复制构建好的 JAR 文件
-COPY --from=build /app/km3/jeecg-boot/jeecg-module-system/jeecg-system-start/target/jeecg-system-start-3.7.1.jar /kykms/
+CMD cp /app/km3/jeecg-boot/jeecg-module-system/jeecg-system-start/target/jeecg-system-start-3.7.1.jar /kykms/
 
 WORKDIR /kykms
 

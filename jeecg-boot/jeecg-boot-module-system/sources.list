@@ -1,0 +1,12 @@
+deb http://mirrors.aliyun.com/debian/ bullseye main contrib non-free
+deb-src http://mirrors.aliyun.com/debian/ bullseye main contrib non-free
+
+deb http://mirrors.aliyun.com/debian-security bullseye-security main contrib non-free
+deb-src http://mirrors.aliyun.com/debian-security bullseye-security main contrib non-free
+
+deb http://mirrors.aliyun.com/debian/ bullseye-updates main contrib non-free
+deb-src http://mirrors.aliyun.com/debian/ bullseye-updates main contrib non-free
+
+# 如果需要启用 backports 仓库，请取消下面两行的注释：
+# deb http://mirrors.aliyun.com/debian/ bullseye-backports main contrib non-free
+# deb-src http://mirrors.aliyun.com/debian/ bullseye-backports main contrib non-free
