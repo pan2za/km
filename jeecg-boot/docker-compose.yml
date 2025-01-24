@@ -127,6 +127,9 @@ services:
     ports:
       - 30018:8080
 
+    volumes:
+      - kykms_data:/kykms/kmdocs/
+
     networks:
       - opensearch-net
 
@@ -157,6 +160,7 @@ services:
 volumes:
   opensearch-data1:
   opensearch-data2:
+  kykms_data:
 
 networks:
   opensearch-net:
