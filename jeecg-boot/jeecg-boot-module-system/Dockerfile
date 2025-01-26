@@ -24,6 +24,7 @@ ADD ./simsun.ttc /usr/share/fonts
 # 使用清华源替换默认源
 
 RUN apt-get update && \
+    apt-get install -y iputils-ping && \
     apt-get install -y git && \
     apt-get install -y libreoffice libfreetype6 fontconfig fonts-dejavu 
 
