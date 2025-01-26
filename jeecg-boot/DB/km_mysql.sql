@@ -175,9 +175,9 @@ INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `creat
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('3', 'ConvertFileTypes', 'doc,xls,pdf,ppt,txt,xlsx,docx,pptx,jpg,jpeg,bmp,png,gif', '自动进行预览文件转换的文件格式', NULL, 'text', '');
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('11', 'RecommendHotTopic', '0', '是否在首页推荐热门专题', NULL, 'text', '');
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('13', 'CommonAuthEnable', '1', '是否启用知识权限控制通用规则', NULL, 'text', '');
-INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('14', 'SiteTitle', '科亿知识库', '站点名称', NULL, 'text', '');
-INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('15', 'SiteHomePageUrl', 'http://www.kykms.cn', '站点首页url', NULL, 'text', '');
-INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('16', 'SiteCopyRight', '科亿信息技术', '站点版权所有者', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('14', 'SiteTitle', '椰子树知识库', '站点名称', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('15', 'SiteHomePageUrl', 'http://www.coconet.cn', '站点首页url', NULL, 'text', '');
+INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('16', 'SiteCopyRight', '椰子树信息技术', '站点版权所有者', NULL, 'text', '');
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('17', 'SiteAvatar', 'temp/logo_透明_1666960531563.png', '站点logo', NULL, 'img', '');
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('19', 'DefaultPageUseTopicList', '0', '启用知识专题目录树浏览页作为首页', NULL, 'checkBox', '');
 INSERT INTO `km_sys_config`(`id`, `item_code`, `item_value`, `item_name`, `create_time`, `value_type`, `value_options`) VALUES ('20', 'HeaderBackgroundColor', '#03A7EF', '页面抬头背景色', NULL, 'text', '');
