@@ -28,6 +28,11 @@ echo "Pulling 768 embed model..."
 curl -X POST ${OLLAMA_BASE_URL}/api/pull -d '{
   "name": "mofanke/dmeta-embedding-zh"
 }'
+
+echo "Pulling realbig deepseek model..."
+curl -X POST ${OLLAMA_BASE_URL}/api/pull -d '{
+  "name": "deepseek-coder-v2:16b-lite-instruct-q5_K_M"
+}'
 echo "Pulling ${MODEL} model..."
 curl -X POST ${OLLAMA_BASE_URL}/api/pull -d '{
   "name": "'${MODEL}'"

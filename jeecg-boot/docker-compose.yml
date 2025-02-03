@@ -156,11 +156,33 @@ services:
       "/ragapp/setup_ollama.sh"
     depends_on:
       - ollama
-        
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    volumes:
+      - open-webui:/app/backend/data
+    depends_on:
+      - ollama
+    ports:
+      - 30020:8080
+    environment:
+      - TZ=Asia/Shanghai
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - 'HF_ENDPOINT=https://hf-mirror.com'
+      - ENABLE_OPENAI=false
+      - USE_OLLAMA_DOCKER=true
+      - ENABLE_OPENAI_API=false
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - opensearch-net
+
 volumes:
   opensearch-data1:
   opensearch-data2:
   kykms_data:
+  open-webui:
 
 networks:
   opensearch-net:
