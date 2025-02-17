@@ -48,6 +48,10 @@ import '@/components/jeecg/JVxeTable/install'
 import '@/components/JVxeCells/install'
 //表单验证
 import { rules } from '@/utils/rules'
+// vant
+import Vant from 'vant';
+import 'vant/lib/index.css';
+
 Vue.prototype.rules = rules
 Vue.config.productionTip = false
 Vue.use(Storage, config.storageOptions)
@@ -60,6 +64,7 @@ Vue.use(Print)
 Vue.use(preview)
 Vue.use(vueBus);
 Vue.use(JeecgComponents);
+Vue.use(Vant);
 // Vue.use(VueAreaLinkage);
 SSO.init(() => {
   main()

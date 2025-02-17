@@ -115,4 +115,10 @@ export const constantRouterMap = [
     meta: { title: '知识专题' ,keepAlive: true},
     component: () => import('@/views/km/search/RecommendTopicList')
   },
+  {
+    path:'/front/QuestionAnswering',
+    name:'questionanswering',
+    meta: { title: '智能问答' ,keepAlive: true},
+    component: () => import('@/views/AI/index')
+  },
 ]
