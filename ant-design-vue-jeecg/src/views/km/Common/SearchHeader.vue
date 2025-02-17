@@ -16,6 +16,9 @@
       <span class="top-txt" v-if="token!=null" @click="jumpTopicPage()">
         <a-space><a-icon type="folder" class="iconOfMenu"/>知识浏览</a-space>
       </span>
+      <span class="top-txt" v-if="token!=null" @click="jumpAI()">
+        <a-space><a-icon type="bulb" class="iconOfMenu"/>智能问答</a-space>
+      </span>
       <span class="top-txt" v-if="token!=null" @click="jumpSearchPage()">
         <a-space><a-icon type="search" class="iconOfMenu"/>综合检索</a-space>
       </span>
@@ -87,6 +90,14 @@ export default {
         window.open(routeData.href, '_blank')
       }
     },
+    jumpAI() {
+      let token = this.token
+      if (token == '' || token == null) {
+        this.$router.push('/front/user/login')
+      } else {
+        this.$router.push('/front/QuestionAnswering')
+      }
+    }, 
     // // 跳转到收藏夹
     // jumpKmDocFavouritePage() {
     //   let token = this.token

@@ -16,7 +16,18 @@ export function postAction(url, parameter) {
   return axios({
     url: url,
     method: 'post',
-    data: parameter
+    data: parameter,
+  })
+}
+export function postActionstrem(url, parameter) {
+  return axios({
+    url: url,
+    method: 'post',
+    data: parameter,
+    responseType: 'stream',
+    headers: {
+      'Accept': 'text/event-stream',
+    }
   })
 }
 
@@ -172,14 +183,14 @@ export function downloadFileName(url, parameter) {
   return downFile(url, parameter).then((response) => {
     var fileName;
     // 前提是服务端要在header设置Access-Control-Expose-Headers: Content-Disposition
- // 前端才能正常获取到Content-Disposition内容
+    // 前端才能正常获取到Content-Disposition内容
     var temp = response.headers['content-disposition']
     var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
     var matches = filenameRegex.exec(temp)
     if (matches != null && matches[1]) {
       let filename1 = matches[1].replace(/['"]/g, '')
-      filename1 =filename1.replace(/\+/g,"%20")
-      fileName=decodeURIComponent(filename1)
+      filename1 = filename1.replace(/\+/g, "%20")
+      fileName = decodeURIComponent(filename1)
     }
     if (!response.data || response.data.size === 0) {
       Vue.prototype['$message'].warning('文件下载失败')
